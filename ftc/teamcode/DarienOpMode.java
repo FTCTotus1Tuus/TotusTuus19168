@@ -1,5 +1,5 @@
 package org.firstinspires.ftc.teamcode;
-//import org.firstinspires.ftc.teamcode.AllMethods;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -27,10 +27,12 @@ import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="RedCorners",group="Linear Opmode") 
-public class RedCorners extends LinearOpMode {
-    //must be name of file
+@Autonomous
+
+public class DarienOpMode extends LinearOpMode{
+      //must be name of file
      // ALL VARIABLES IN THIS CHUNK ARE GLOBAL 
     //Initialize Variables
     public final double SCALE_FACTOR = 255;
@@ -76,9 +78,8 @@ public class RedCorners extends LinearOpMode {
         // initColorSensors();
         // initColorSensors();
     
-   public void runOpMode() {
-            
-        omniMotor0 = initializeMotor("omniMotor0");
+   public void initialize() {
+       omniMotor0 = initializeMotor("omniMotor0");
         omniMotor1 = initializeMotor("omniMotor1");
         omniMotor2 = initializeMotor("omniMotor2");
         omniMotor3 = initializeMotor("omniMotor3");
@@ -99,82 +100,11 @@ public class RedCorners extends LinearOpMode {
    
         //test/init telemetry
         print("Motors Init","");
-
-
-        // Wait for the driver to start - must press play -- will run until driver presses 
-        waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
-
-       MoveZ(-1800, 0.2);
-        MoveY(tileDist, 0.125);
-        //move to color cone
-        while (omniMotor0.isBusy()){}
-        //stop, add color sensing code
-       //get parking space
-       
- 
-        parkPos = getParkPos();
-
-        Rotate(-515, 0.5);
-        while (omniMotor0.isBusy()){}
-        //back up to pole
-        MoveY(-175, 0.125);
-        while (omniMotor0.isBusy()){}
-        MoveY(-100, 0.11);
-        while (omniMotor0.isBusy()){}
-        MoveY(5,0.1);
-        while (omniMotor0.isBusy()){}
-        sleep(200);
-        //drop cone
-        grabServo.setPower(-0.5);
-        sleep(1000);
-        grabServo.setPower(0.1);
-        //return
-        MoveY(305, 0.125);
-        while (omniMotor0.isBusy()){}
-        Rotate(-435, 0.5);
-        
-        while (omniMotor0.isBusy()){}
-        //GotoParking Space
-        switch(parkPos)
-        {
-            //Green
-            case 1:
-                MoveY(600, 0.25);
-                break;
-            //Red
-            case 2:
-                MoveY(-90, 0.25);
-                break;
-            //Blue
-            case 3:
-                MoveY(-680, 0.25);
-                break;
-        }
-        // while (omniMotor0.isBusy()){}
-        // Rotate(950, 0.33);
-        // while (omniMotor0.isBusy()){}
-        // MoveY(300, 0.15);
-        while(omniMotor0.isBusy()){}
-        wristServo.setPower(-1);
-        sleep(500);
-        
-         //MoveY(800,  0.125);
- while (opModeIsActive()){        
-    
-    this.telemetry.addData("TargetPos", Integer.toString(ZencoderPos));
-    this.telemetry.addData("encoder", Integer.toString(linearExtender.getTargetPosition()));
-    this.telemetry.addData("alpha", Integer.toString(colorSensor0.alpha()));
-    this.telemetry.addData("blue: ", Integer.toString(colorSensor0.blue()));
-    this.telemetry.addData("green: ", Integer.toString(colorSensor0.green()));
-    this.telemetry.addData("red: ", Integer.toString(colorSensor0.red()));
-    this.telemetry.addData("hue: ", Integer.toString(colorSensor0.argb()));
-    this.telemetry.update();
-     
-    
- }   }
- 
- 
-    public int getParkPos()
+   }
+      public void runOpMode(){
+          
+      }
+       public int getParkPos()
     {
             if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/1.5))
             {
@@ -217,8 +147,8 @@ public class RedCorners extends LinearOpMode {
    }
    
    public void MoveY(int y, double power){
-       resetEncoder();
        
+       resetEncoder();
        encoderPos = (int) Math.floor((y * constant+ 0.5));
        setTargetPosY();
        
@@ -407,6 +337,5 @@ public class RedCorners extends LinearOpMode {
         return false; 
     }
 
-
-
+      
 }

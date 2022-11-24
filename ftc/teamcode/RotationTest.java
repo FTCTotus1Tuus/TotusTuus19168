@@ -1,6 +1,11 @@
 package org.firstinspires.ftc.teamcode;
-//import org.firstinspires.ftc.teamcode.AllMethods;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 //import com.qualcomm.robotcore.util.Hardware;
@@ -27,9 +32,11 @@ import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 
-@Autonomous(name="RedCorners",group="Linear Opmode") 
-public class RedCorners extends LinearOpMode {
+
+@Autonomous(name="RotationTest",group="Linear Opmode") 
+public class RotationTest extends LinearOpMode {
     //must be name of file
      // ALL VARIABLES IN THIS CHUNK ARE GLOBAL 
     //Initialize Variables
@@ -45,6 +52,17 @@ public class RedCorners extends LinearOpMode {
        public double cos = Math.cos((Math.PI)/4);
        public double constMult = (48 * 2 * (Math.PI));
        public double constant = 537.7 / constMult;
+       
+        private double  targetHeading;
+        static final double     P_TURN_GAIN            = 0.03; 
+        static final double     P_DRIVE_GAIN           = 0.04;  
+        static final double     TURN_SPEED              = 0.2;
+        static final double     HEADING_THRESHOLD       = 1.0;   
+        private BNO055IMU       imu;    
+        private double headingError;
+        private double  turnSpeed;
+        private double robotHeading;
+        private double headingOffset;
        
        public int tileDist = 600;
        //600?
@@ -92,73 +110,30 @@ public class RedCorners extends LinearOpMode {
         omniMotor2.setDirection(DcMotor.Direction.REVERSE);
         omniMotor3.setDirection(DcMotor.Direction.FORWARD);
         linearExtender.setDirection(DcMotor.Direction.REVERSE);
-        
-        //servo0 = initializeServo("servo0");
-        //servo0 = hardwareMap.get(Servo.class, "wristServo");
-        //grabServo = hardwareMap.get(Servo.class, "grabServo");
-   
+
         //test/init telemetry
         print("Motors Init","");
-
+        
+        // define initialization values for IMU, and then initialize it.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         // Wait for the driver to start - must press play -- will run until driver presses 
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
 
-       MoveZ(-1800, 0.2);
-        MoveY(tileDist, 0.125);
-        //move to color cone
-        while (omniMotor0.isBusy()){}
-        //stop, add color sensing code
-       //get parking space
-       
- 
-        parkPos = getParkPos();
-
-        Rotate(-515, 0.5);
-        while (omniMotor0.isBusy()){}
-        //back up to pole
-        MoveY(-175, 0.125);
-        while (omniMotor0.isBusy()){}
-        MoveY(-100, 0.11);
-        while (omniMotor0.isBusy()){}
-        MoveY(5,0.1);
-        while (omniMotor0.isBusy()){}
-        sleep(200);
-        //drop cone
-        grabServo.setPower(-0.5);
-        sleep(1000);
-        grabServo.setPower(0.1);
-        //return
-        MoveY(305, 0.125);
-        while (omniMotor0.isBusy()){}
-        Rotate(-435, 0.5);
-        
-        while (omniMotor0.isBusy()){}
-        //GotoParking Space
-        switch(parkPos)
-        {
-            //Green
-            case 1:
-                MoveY(600, 0.25);
-                break;
-            //Red
-            case 2:
-                MoveY(-90, 0.25);
-                break;
-            //Blue
-            case 3:
-                MoveY(-680, 0.25);
-                break;
-        }
-        // while (omniMotor0.isBusy()){}
+      while (omniMotor0.isBusy()){}
         // Rotate(950, 0.33);
         // while (omniMotor0.isBusy()){}
-        // MoveY(300, 0.15);
-        while(omniMotor0.isBusy()){}
+        // MoveY(-300, 0.15);
         wristServo.setPower(-1);
         sleep(500);
-        
-         //MoveY(800,  0.125);
+        // MoveZ(0, 0.125);
+    //      MoveY(800,  0.125);
+    
+    turnToHeading(0.5, -90);
+    
  while (opModeIsActive()){        
     
     this.telemetry.addData("TargetPos", Integer.toString(ZencoderPos));
@@ -217,8 +192,8 @@ public class RedCorners extends LinearOpMode {
    }
    
    public void MoveY(int y, double power){
-       resetEncoder();
        
+       resetEncoder();
        encoderPos = (int) Math.floor((y * constant+ 0.5));
        setTargetPosY();
        
@@ -298,54 +273,43 @@ public class RedCorners extends LinearOpMode {
     omniMotor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
    }
    
+
    
-   
-//   public void controllerTest()
-//   {
-//           if(gamepad1.y){
-//         this.telemetry.addData("Moving", "North...");
-//         MoveY(1 * tileDist,  0.125);
-//     };
-//     if(gamepad1.a){
-//         this.telemetry.addData("Moving", "South...");
-//         MoveY(-1 * tileDist,  0.125);
-//     }
-//     if(gamepad1.b){
-//         this.telemetry.addData("Moving", "West...");
-//         MoveX(1 * tileDist,  0.125);
-//     };
-//     if(gamepad1.x){
-//         this.telemetry.addData("Moving", "East...");
-//         MoveX(-1 * tileDist,  0.125);
-//     }
+    public void turnToHeading(double maxTurnSpeed, double heading) {
+
+
+        // keep looping while we are still active, and not on heading.
+        while (getRawHeading() - heading > 5) {
+            // Pivot in place by applying the turning correction
+            Rotate( (int) Math.floor((heading) + 0.5), turnSpeed);
+
+        }
+
+        // Stop all motion;
+        MoveX(0, 0);
+    }
+    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
+        targetHeading = desiredHeading;  // Save for telemetry
+
+        // Get the robot heading by applying an offset to the IMU heading
+        robotHeading = getRawHeading() - headingOffset;
+
+        // Determine the heading current error
+        headingError = targetHeading - robotHeading;
+
+        // Normalize the error to be within +/- 180 degrees
+        while (headingError > 180)  headingError -= 360;
+        while (headingError <= -180) headingError += 360;
+
+        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+        return Range.clip(headingError * proportionalGain, -1, 1);
+    }
+
+    public double getRawHeading() {
+        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
+    }
     
-//     if(gamepad1.dpad_down){
-//         this.telemetry.addData("Moving", "Down...");
-//         MoveZ(1 * armDist,  0.125);
-//     };
-//     if(gamepad1.dpad_up){
-//         this.telemetry.addData("Moving", "Up...");
-//         MoveZ(-1 * armDist,  0.125);
-//     }
-    
-//     if(gamepad1.dpad_left){
-//         this.telemetry.addData("Moving Claw", "open");
-//         wristServo.setPosition(-10);
-//     };
-//     if(gamepad1.dpad_right){
-//         this.telemetry.addData("Moving Claw", "close");
-//         wristServo.setPosition(10);
-//     }
-//     if(gamepad1.left_bumper){
-//         this.telemetry.addData("Moving Claw", "L");
-//         grabServo.setPosition(-10);
-//     };
-//     if(gamepad1.right_bumper){
-//         this.telemetry.addData("Moving Claw", "R");
-//         grabServo.setPosition(10);
-//     }
-//   }
-   
      public double getMatchTime(){
         return this.time - match_start_time;
     }
