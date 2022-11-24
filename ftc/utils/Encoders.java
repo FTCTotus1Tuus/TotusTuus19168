@@ -72,7 +72,7 @@ public class Encoders extends LinearOpMode
 
         // wait 5 sec to you can observe the final encoder position.
 
-        resetStartTime();
+        //resetStartTime();
 
         while (opModeIsActive() && getRuntime() < 5)
         {
@@ -108,7 +108,7 @@ public class Encoders extends LinearOpMode
         leftMotor.setPower(0.0);
         rightMotor.setPower(0.0);
 
-        resetStartTime();
+        //resetStartTime();
 
         while (opModeIsActive() && getRuntime() < 5)
         {
