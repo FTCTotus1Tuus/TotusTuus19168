@@ -76,7 +76,7 @@ public class ControllerMode extends LinearOpMode{
         linearExtender = initializeMotor("linearExtender");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
-        grabServo.setDirection(CRServo.Direction.REVERSE);
+        grabServo.setDirection(CRServo.Direction.FORWARD);
         
         Files.test("org.firstinspires.ftc/teamcode/AutonomousData.txt", this);
         
@@ -107,21 +107,28 @@ public class ControllerMode extends LinearOpMode{
             //telemetry.addData("armPowerWithChange", armPowerWithChange);
             telemetry.update();
           
-          
-            if (gamepad2.left_bumper)
-            {
-                grabServo.setPower(0.50);
-            } else {grabServo.setPower(-0.25);}
+            double grabPower = clamp(0.5 -gamepad2.left_trigger, -0.35, 0.35);
+            telemetry.addData("grabPower", grabPower);
+            grabServo.setPower(grabPower);
+            
+            double wristPower = clamp(1 -2*gamepad2.right_trigger, -0.9, 0.9);
+            telemetry.addData("wristPower", wristPower);
+            wristServo.setPower(wristPower);
+            // if (gamepad2.left_bumper)
+            // { // open the claw
+            //     grabServo.setPower(-0.35);
+            // }
+            // else {
+            //     grabServo.setPower(0.35);
+            // }
 
-            if (gamepad2.a) {
-            wristServo.setPower(1);
-            } else if (gamepad2.b)
-            {
-                wristServo.setPower(0.5);
-            } else
-            {
-                wristServo.setPower(-1);
-            } 
+            // if (gamepad2.a) {
+            //     wristServo.setPower(1);
+            // } else if (gamepad2.b) {
+            //     wristServo.setPower(0.5);
+            // } else {
+            //     wristServo.setPower(-1);
+            // } 
             
    
             
