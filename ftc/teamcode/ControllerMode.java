@@ -111,26 +111,17 @@ public class ControllerMode extends LinearOpMode{
             telemetry.addData("grabPower", grabPower);
             grabServo.setPower(grabPower);
             
-            double wristPower = clamp(1 -2*gamepad2.right_trigger, -0.9, 0.9);
-            telemetry.addData("wristPower", wristPower);
-            wristServo.setPower(wristPower);
-            // if (gamepad2.left_bumper)
-            // { // open the claw
-            //     grabServo.setPower(-0.35);
-            // }
-            // else {
-            //     grabServo.setPower(0.35);
-            // }
-
-            // if (gamepad2.a) {
-            //     wristServo.setPower(1);
-            // } else if (gamepad2.b) {
-            //     wristServo.setPower(0.5);
-            // } else {
-            //     wristServo.setPower(-1);
-            // } 
             
-   
+            if (gamepad2.a){
+                wristServo.setPower(1);
+            }
+            else if (gamepad2.b){
+                wristServo.setPower(-1);
+            }
+            else {
+                wristServo.setPower(0);
+            }
+            
             
             linearExtender.setPower(-gamepad2.left_stick_y/1.2);
             
