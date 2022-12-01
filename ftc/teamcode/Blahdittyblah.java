@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-
+@Autonomous(name="Blahdittyblah",group="Linear Opmode")
 public class Blahdittyblah extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -61,7 +61,7 @@ public class Blahdittyblah extends LinearOpMode {
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable
 
 
-    @Override
+    //@Override
     public void runOpMode() {
 
         // Initialize the drive system variables.
