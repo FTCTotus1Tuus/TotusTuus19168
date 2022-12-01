@@ -42,7 +42,7 @@ public void runOpMode() {
         // Wait for the driver to start - must press play -- will run until driver presses 
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
 
-       MoveZ(-1800, 0.2);
+   MoveZ(-1800, 0.2);
         MoveY(tileDist, 0.125);
         //move to color cone
         while (omniMotor0.isBusy()){}
@@ -52,7 +52,7 @@ public void runOpMode() {
  
         parkPos = getParkPos();
 
-        RotateOld(-515, 0.5);
+        Rotate(-515, 0.5);
         while (omniMotor0.isBusy()){}
         //back up to pole
         MoveY(-175, 0.125);
@@ -69,7 +69,7 @@ public void runOpMode() {
         //return
         MoveY(305, 0.125);
         while (omniMotor0.isBusy()){}
-        RotateOld(-435, 0.5);
+        Rotate(-435, 0.5);
         
         while (omniMotor0.isBusy()){}
         //GotoParking Space
@@ -95,6 +95,7 @@ public void runOpMode() {
         while(omniMotor0.isBusy()){}
         wristServo.setPower(-1);
         sleep(500);
+        
          //MoveY(800,  0.125);
  while (opModeIsActive()){        
     

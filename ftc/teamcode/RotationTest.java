@@ -48,15 +48,11 @@ public class RotationTest extends LinearOpMode {
     public double rotation;
     
        public int encoderPos =0;
-       public int encoderPos0,encoderPos1,encoderPos2,encoderPos3 =0;
-       //public int encoderPos1 =0;
-       //public int encoderPos2 =0;
-    //   public int encoderPos3 =0;
-      public int ZencoderPos =0;
+       public int ZencoderPos =0;
        public double cos = Math.cos((Math.PI)/4);
        public double constMult = (48 * 2 * (Math.PI));
        public double constant = 537.7 / constMult;
-       public double rotateDirection;
+       
         private double  targetHeading;
         static final double     P_TURN_GAIN            = 0.03; 
         static final double     P_DRIVE_GAIN           = 0.04;  
@@ -126,22 +122,20 @@ public class RotationTest extends LinearOpMode {
 
         // Wait for the driver to start - must press play -- will run until driver presses 
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
-        Rotate(90);
-        //while (omniMotor0.isBusy()){}
-    //   while (omniMotor0.isBusy()){}
-    //     // Rotate(950, 0.33);
-    //     // while (omniMotor0.isBusy()){}
-    //     // MoveY(-300, 0.15);
-    //     wristServo.setPower(-1);
-    //     sleep(500);
-    //     // MoveZ(0, 0.125);
-    // //      MoveY(800,  0.125);
+
+      while (omniMotor0.isBusy()){}
+        // Rotate(950, 0.33);
+        // while (omniMotor0.isBusy()){}
+        // MoveY(-300, 0.15);
+        wristServo.setPower(-1);
+        sleep(500);
+        // MoveZ(0, 0.125);
+    //      MoveY(800,  0.125);
     
-    // turnToHeading(0.5, -90);
+    turnToHeading(0.5, -90);
     
  while (opModeIsActive()){        
     
-    this.telemetry.addData("Gyro", Double.toString(getRawHeading()));
     this.telemetry.addData("TargetPos", Integer.toString(ZencoderPos));
     this.telemetry.addData("encoder", Integer.toString(linearExtender.getTargetPosition()));
     this.telemetry.addData("alpha", Integer.toString(colorSensor0.alpha()));
@@ -176,45 +170,13 @@ public class RotationTest extends LinearOpMode {
                 return 1;
             } 
     }
-    public void setToRotateRunMode(){
-        omniMotor0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        omniMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        omniMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        omniMotor3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-    public void Rotate(int heading)
-    {   
-    while (!omniMotor0.isBusy()){
-        if (heading > 180){
-            rotateDirection = 1;
-        }
-        else {
-            rotateDirection = -1;
-        }
-        setToRotateRunMode();
-        setRotatePower(0.25, rotateDirection);
-        
-        if (Math.abs(getRawHeading() - heading) <= 5.75) {
-            encoderPos0 = omniMotor0.getCurrentPosition();
-            encoderPos1 = omniMotor1.getCurrentPosition();
-            encoderPos2 = omniMotor2.getCurrentPosition();
-            encoderPos3 = omniMotor3.getCurrentPosition();
-            setRunMode();
-            omniMotor0.setTargetPosition(encoderPos0);
-            omniMotor1.setTargetPosition(encoderPos1);
-            omniMotor2.setTargetPosition(encoderPos2);
-            omniMotor3.setTargetPosition(encoderPos3);
-        }
-        
-    }
-        
-    }
-    public void setRotatePower(double power, double direction){
-        omniMotor0.setPower(direction*power);
-        omniMotor1.setPower(-direction*power);
-        omniMotor2.setPower(direction*power);
-        omniMotor3.setPower(-direction*power);
-        
+    public void Rotate(int rotation, double power)
+    {
+        resetEncoder();
+        encoderPos = rotation;
+        setTargetPosRot();
+        setRunMode();
+        setPower(power);
     }
     // maybe change V to Z?
     // yessir        /
@@ -313,7 +275,19 @@ public class RotationTest extends LinearOpMode {
    
 
    
-   
+    public void turnToHeading(double maxTurnSpeed, double heading) {
+
+
+        // keep looping while we are still active, and not on heading.
+        while (getRawHeading() - heading > 5) {
+            // Pivot in place by applying the turning correction
+            Rotate( (int) Math.floor((heading) + 0.5), turnSpeed);
+
+        }
+
+        // Stop all motion;
+        MoveX(0, 0);
+    }
     public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
         targetHeading = desiredHeading;  // Save for telemetry
 
@@ -333,25 +307,19 @@ public class RotationTest extends LinearOpMode {
 
     public double getRawHeading() {
         Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        if (angles.firstAngle >= 0){
-            return angles.firstAngle;
-       
-        }
-        else {
-            return angles.firstAngle + 361;
-        }
+        return angles.firstAngle;
     }
     
-    //  public double getMatchTime(){
-    //     return this.time - match_start_time;
-    // }
+     public double getMatchTime(){
+        return this.time - match_start_time;
+    }
     
-    // public boolean isEndGame(){
-    //     if(getMatchTime() < 90){
-    //         return false;
-    //     }
-    //     return true;
-    // }
+    public boolean isEndGame(){
+        if(getMatchTime() < 90){
+            return false;
+        }
+        return true;
+    }
     
     int move_to_position;
     double y;
@@ -396,12 +364,12 @@ public class RotationTest extends LinearOpMode {
         return (hardwareMap.voltageSensor.iterator().next().getVoltage());
         }
         
-    // boolean timeBetween(double startTime, double endTime){
-    //     if((this.time  >= startTime) && (this.time <= endTime)){
-    //         return true;
-    //     }
-    //     return false; 
-    // }
+    boolean timeBetween(double startTime, double endTime){
+        if((this.time  >= startTime) && (this.time <= endTime)){
+            return true;
+        }
+        return false; 
+    }
 
 
 

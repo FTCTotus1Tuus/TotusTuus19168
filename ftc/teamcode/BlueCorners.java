@@ -53,7 +53,7 @@ public void runOpMode() {
  
         parkPos = getParkPos();
 
-        RotateOld(500, 0.5);
+        Rotate(500, 0.5);
         while (omniMotor0.isBusy()){}
         //back up to pole
         MoveY(-175, 0.125);
@@ -70,7 +70,7 @@ public void runOpMode() {
         grabServo.setPower(-0.1);
         MoveY(275, 0.125);
         while (omniMotor0.isBusy()){}
-        RotateOld(475, 0.5);
+        Rotate(475, 0.5);
         
         while (omniMotor0.isBusy()){}
         //GotoParking Space
@@ -86,7 +86,7 @@ public void runOpMode() {
                 break;
             //Blue
             case 3:
-                RotateOld(-25, 0.3);
+                Rotate(-25, 0.5);
                 while (omniMotor0.isBusy()){}
                 MoveY(625, 0.25);
                 break;
