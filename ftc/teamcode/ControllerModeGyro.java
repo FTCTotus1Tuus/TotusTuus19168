@@ -1,10 +1,11 @@
-/*
-Copyright your 
-*/
-
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import java.util.Random;
 import org.firstinspires.ftc.robotcore.external.navigation.Rotation;
@@ -19,9 +20,9 @@ import java.util.*;
 import java.io.*;
 
 import org.firstinspires.ftc.utils.Files;
-@TeleOp(name="ControllerMode",group="Linear Opmode")
+@TeleOp(name="ControllerModeGyro",group="Linear Opmode")
 
-public class ControllerMode extends LinearOpMode{
+public class ControllerModeGyro extends LinearOpMode{
     //Initialize Variables
     Hashtable<String, List<Double>> motorPowerLogs = new Hashtable<String, List<Double>>();
     Boolean replaying = false;
@@ -32,6 +33,7 @@ public class ControllerMode extends LinearOpMode{
     // For Movement
     // int, float, double 
     double[] direction = {0.0,0.0};
+    double[] direction2 = {0.0,0.0};
     double rotation;
     
     
@@ -57,6 +59,12 @@ public class ControllerMode extends LinearOpMode{
     
     double armPower;
     
+    private BNO055IMU       imu         = null;      // Control/Expansion Hub IMU
+
+    private double          robotHeading  = 0;
+    private double          headingOffset = 0;
+    private double          headingError  = 0;
+    private double          targetHeading = 0;
 
     
     public void runOpMode() {
@@ -78,7 +86,15 @@ public class ControllerMode extends LinearOpMode{
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
         grabServo.setDirection(CRServo.Direction.FORWARD);
         
+        
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+        
         Files.test("org.firstinspires.ftc/teamcode/AutonomousData.txt", this);
+        
+        robotHeading = getRawHeading();
         
         
         telemetry.update();
@@ -94,35 +110,41 @@ public class ControllerMode extends LinearOpMode{
             
             
         
-            MoveRobot(direction, -rotation);
-          
+            MoveRobotGyro(direction, -rotation);
+            //MoveRobot(direction, -rotation);
             
             
             telemetry.addData("gamepad1.left_stick_x", gamepad1.left_stick_x);
             telemetry.addData("gamepad1.left_stick_y", gamepad1.left_stick_y);
             telemetry.addData("gamepad1.right_stick_x", gamepad1.right_stick_x);
+            telemetry.addData("gamepad1.right_stick_y", gamepad1.right_stick_y);
             telemetry.addData("gamepad1.left_trigger", gamepad1.left_trigger);
             
             telemetry.addData("time", this.time);
+            
+            
+            //robotHeading = getRawHeading();
+            telemetry.addData("Angle Target:Current", "%5.2f:%5.0f", targetHeading, robotHeading);
+            
             //telemetry.addData("armPowerWithChange", armPowerWithChange);
             telemetry.update();
           
             //stops claw
-            if (!(gamepad2.x | gamepad2.y)){
+            if (!(gamepad1.x | gamepad1.y)){
                 grabServo.setPower(0);
             }
             //opens claw
-            else if (gamepad2.y){
+            else if (gamepad1.y){
                 grabServo.setPower(-0.35);
             }
             //closes claw
-            else if(gamepad2.x){
+            else if(gamepad1.x){
                 grabServo.setPower(0.35);
             }
-            if (gamepad2.a){
+            if (gamepad1.a){
                 wristServo.setPower(1);
             }
-            else if (gamepad2.b){
+            else if (gamepad1.b){
                 wristServo.setPower(-1);
             }
             else {
@@ -130,7 +152,7 @@ public class ControllerMode extends LinearOpMode{
             }
             
             
-            linearExtender.setPower(-gamepad2.left_stick_y/1.2);
+            linearExtender.setPower(-gamepad1.right_stick_y/1.2);
             
             
             }
@@ -156,6 +178,43 @@ public class ControllerMode extends LinearOpMode{
         MoveMotor(omniMotor3,wheel3/div_by);
     }
         
+    public void MoveRobotGyro(double[] direction, double rotation){
+        
+        robotHeading = getRawHeading() * Math.PI / 180;
+        
+        direction2[0] = Math.cos(robotHeading) * direction[0] - Math.sin(robotHeading) * direction[1];
+        
+        direction2[1] = Math.sin(robotHeading) * direction[0] + Math.cos(robotHeading) * direction[1];
+        
+        //rotation = (180 * rotation);
+        
+        //rotation = rotation - robotHeading;
+        //if (rotation <= -180){rotation += 180;}
+        //if (rotation >= 180){rotation -= 180;}
+
+        //rotation = rotation/180.0;
+        
+        //telemetry.addData("gamepad1.left_stick_x", gamepad1.left_stick_x);
+        //telemetry.addData("gamepad1.left_stick_y", gamepad1.left_stick_y);
+        //telemetry.addData("gamepad1.right_stick_x", gamepad1.right_stick_x);
+        //telemetry.addData("gamepad1.right_stick_y", gamepad1.right_stick_y);
+        telemetry.addData("d2X", direction2[0]);
+        telemetry.addData("d2Y", direction2[1]);
+        telemetry.addData("ARH", robotHeading);
+        
+        
+        
+        
+        double wheel0 = clamp(-direction2[0] + direction2[1] - rotation, -1, 1);
+        double wheel1 = clamp(direction2[0] + direction2[1] + rotation, -1, 1);
+        double wheel2 = clamp(-direction2[0] + -direction2[1] + rotation, -1, 1);
+        double wheel3 = clamp(direction2[0] + -direction2[1] - rotation, -1, 1);
+                
+        MoveMotor(omniMotor0,wheel0/div_by);
+        MoveMotor(omniMotor1,wheel1/div_by);
+        MoveMotor(omniMotor2,wheel2/div_by);
+        MoveMotor(omniMotor3,wheel3/div_by);
+    }
     
         
     public DcMotor initializeMotor(String name){
@@ -165,16 +224,40 @@ public class ControllerMode extends LinearOpMode{
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.motorPowerLogs.put(motor.getDeviceName(), new ArrayList<Double>());
          return motor;
-     }
+    }
      
-     public void MoveMotor(DcMotor motor, double power){
+    public void MoveMotor(DcMotor motor, double power){
          /*This function just moves the motors and updates the
          logs for replay*/
          motor.setPower(power);
          this.motorPowerLogs.get(motor.getDeviceName()).add(power);
          
-     }
-     public static double clamp(double val, double min, double max) {
+    }
+    public static double clamp(double val, double min, double max) {
         return Math.max(min, Math.min(max, val));
     }
+    
+
+    public double getRawHeading() {
+        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
+    }
+
+
+    
+
+    /**
+     * Reset the "offset" heading back to zero
+     */
+    public void resetHeading() {
+        // Save a new heading offset equal to the current raw heading.
+        headingOffset = getRawHeading();
+        robotHeading = 0;
+    }    
+   
+    
 }
+
+
+
+

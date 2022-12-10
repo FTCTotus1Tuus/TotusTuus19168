@@ -1,6 +1,15 @@
 package org.firstinspires.ftc.teamcode;
-
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 //import com.qualcomm.robotcore.util.Hardware;
@@ -26,7 +35,7 @@ import java.io.*;
 import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
@@ -42,16 +51,21 @@ public class DarienOpMode extends LinearOpMode{
     public double[] direction = {0.0,0.0};
     public double rotation;
     
+       private BNO055IMU       imu;  
        public int encoderPos =0;
+       public int encoderPos0,encoderPos1,encoderPos2,encoderPos3 =0;
        public int ZencoderPos =0;
        public double cos = Math.cos((Math.PI)/4);
        public double constMult = (48 * 2 * (Math.PI));
        public double constant = 537.7 / constMult;
-       
+       public double rotateDirection;
        public int tileDist = 600;
        //600?
        //changed to 600 to move 1 tile
-       public int armDist = 600;
+       public int robotLength = 420;
+       //Distance to the center of the first tile at start
+       public int robotCenterAtStart = tileDist/2 - robotLength/2;
+       public double autoPower = .25;
        //set arm dist to 600 as well
     // INITIALIZATION ROBOT PARTS
 
@@ -93,26 +107,29 @@ public class DarienOpMode extends LinearOpMode{
         omniMotor2.setDirection(DcMotor.Direction.REVERSE);
         omniMotor3.setDirection(DcMotor.Direction.FORWARD);
         linearExtender.setDirection(DcMotor.Direction.REVERSE);
-        
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
         //servo0 = initializeServo("servo0");
         //servo0 = hardwareMap.get(Servo.class, "wristServo");
         //grabServo = hardwareMap.get(Servo.class, "grabServo");
    
         //test/init telemetry
         print("Motors Init","");
-   }
-      public void runOpMode(){
-          
-      }
-       public int getParkPos()
+   }    
+    public void runOpMode(){
+        //Necessary emptpy method for linear op mode
+    }
+    public int getParkPos()
     {
-            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/1.5))
+            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/*/1.5*/))
             {
                 telemetry.addData("color", "red");
                 telemetry.update();
                 return 2;
             } 
-            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/1.5))
+            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/*/1.5*/))
             {
                 telemetry.addData("color", "blue");
                 telemetry.update();
@@ -125,13 +142,61 @@ public class DarienOpMode extends LinearOpMode{
                 return 1;
             } 
     }
-    public void Rotate(int rotation, double power)
+    public void moveToConeStack(){
+        MoveY(250,autoPower);
+        sleep(100);
+        while(omniMotor0.isBusy()){}
+        Rotate(270);
+        while(omniMotor0.isBusy()){}
+        sleep(100);
+        MoveY(2*tileDist + robotCenterAtStart,autoPower);
+        while(omniMotor0.isBusy());{}
+        sleep(100);
+        wristServo.setPower(-1);
+        sleep(900);
+        wristServo.setPower(0);
+    }
+    public void RotateOld(int rotation, double power)
     {
         resetEncoder();
         encoderPos = rotation;
         setTargetPosRot();
         setRunMode();
         setPower(power);
+    }
+    // maybe change V to Z?
+    // yessir        /
+    //              \/
+     public void Rotate(int heading)
+    {   
+    telemetry.addData("starting rotate function", "");
+    telemetry.update();
+    while (!omniMotor0.isBusy()){
+        if (heading > 180){
+            rotateDirection = 1;
+        }
+        else {
+            rotateDirection = -1;
+        }
+        
+        setToRotateRunMode();
+        setRotatePower(0.25, rotateDirection);
+        
+        if (Math.abs(5.75 + getRawHeading() - heading) <= 5.75) {
+            // resetTargetRotPos();
+            encoderPos0 = omniMotor0.getCurrentPosition();
+            encoderPos1 = omniMotor1.getCurrentPosition();
+            encoderPos2 = omniMotor2.getCurrentPosition();
+            encoderPos3 = omniMotor3.getCurrentPosition();
+            setRunMode();
+            omniMotor0.setTargetPosition(encoderPos0);
+            omniMotor1.setTargetPosition(encoderPos1);
+            omniMotor2.setTargetPosition(encoderPos2);
+            omniMotor3.setTargetPosition(encoderPos3);
+        }
+    }
+        telemetry.addData("finised function", "");
+        telemetry.update();    
     }
     // maybe change V to Z?
     // yessir        /
@@ -199,6 +264,17 @@ public class DarienOpMode extends LinearOpMode{
        omniMotor2.setTargetPosition(encoderPos);
        omniMotor3.setTargetPosition(-encoderPos);
     }
+    public void resetTargetRotPos() {
+            encoderPos0 = omniMotor0.getCurrentPosition();
+            encoderPos1 = omniMotor1.getCurrentPosition();
+            encoderPos2 = omniMotor2.getCurrentPosition();
+            encoderPos3 = omniMotor3.getCurrentPosition();
+            setRunMode();
+            omniMotor0.setTargetPosition(encoderPos0);
+            omniMotor1.setTargetPosition(encoderPos1);
+            omniMotor2.setTargetPosition(encoderPos2);
+            omniMotor3.setTargetPosition(encoderPos3);
+    }
    
 
    
@@ -211,6 +287,12 @@ public class DarienOpMode extends LinearOpMode{
 
    }
    
+    public void setToRotateRunMode(){
+        omniMotor0.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        omniMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        omniMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        omniMotor3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
    public void setPower(double power)
    {
        omniMotor0.setPower(power);
@@ -220,6 +302,14 @@ public class DarienOpMode extends LinearOpMode{
        
    }
    
+   public void setRotatePower(double power, double direction){
+        omniMotor0.setPower(direction*power);
+        omniMotor1.setPower(-direction*power);
+        omniMotor2.setPower(direction*power);
+        omniMotor3.setPower(-direction*power);
+        
+    }
+    
    public void resetEncoder() 
    {
     omniMotor0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -329,6 +419,17 @@ public class DarienOpMode extends LinearOpMode{
      public double getVoltage() {
         return (hardwareMap.voltageSensor.iterator().next().getVoltage());
         }
+        
+    public double getRawHeading() {
+        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        if (angles.firstAngle >= 0){
+            return angles.firstAngle;
+       
+        }
+        else {
+            return angles.firstAngle + 361;
+        }
+    }
         
     boolean timeBetween(double startTime, double endTime){
         if((this.time  >= startTime) && (this.time <= endTime)){
