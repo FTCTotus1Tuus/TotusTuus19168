@@ -65,7 +65,7 @@ public class DarienOpMode extends LinearOpMode{
        public int robotLength = 420;
        //Distance to the center of the first tile at start
        public int robotCenterAtStart = tileDist/2 - robotLength/2;
-       public double autoPower = .25;
+       public double autoPower = .15;
        //set arm dist to 600 as well
     // INITIALIZATION ROBOT PARTS
 
@@ -123,13 +123,13 @@ public class DarienOpMode extends LinearOpMode{
     }
     public int getParkPos()
     {
-            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/*/1.5*/))
+            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/1.2))
             {
                 telemetry.addData("color", "red");
                 telemetry.update();
                 return 2;
             } 
-            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/*/1.5*/))
+            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/1.2))
             {
                 telemetry.addData("color", "blue");
                 telemetry.update();
@@ -143,15 +143,14 @@ public class DarienOpMode extends LinearOpMode{
             } 
     }
     public void moveToConeStack(){
-        MoveY(250,autoPower);
-        sleep(100);
-        while(omniMotor0.isBusy()){}
-        Rotate(270);
-        while(omniMotor0.isBusy()){}
-        sleep(100);
+        // MoveY(250,autoPower);
+        // sleep(100);
+        // while(omniMotor0.isBusy()){}
+        // Rotate(270);
+        // while(omniMotor0.isBusy()){}
+        // sleep(100);
         MoveY(2*tileDist + robotCenterAtStart,autoPower);
         while(omniMotor0.isBusy());{}
-        sleep(100);
         wristServo.setPower(-1);
         sleep(900);
         wristServo.setPower(0);
@@ -172,7 +171,7 @@ public class DarienOpMode extends LinearOpMode{
     telemetry.addData("starting rotate function", "");
     telemetry.update();
     while (!omniMotor0.isBusy()){
-        if (heading > 180){
+        if (getRawHeading() - heading > 0){
             rotateDirection = 1;
         }
         else {
@@ -180,7 +179,7 @@ public class DarienOpMode extends LinearOpMode{
         }
         
         setToRotateRunMode();
-        setRotatePower(0.25, rotateDirection);
+        setRotatePower(0.4, rotateDirection);
         
         if (Math.abs(5.75 + getRawHeading() - heading) <= 5.75) {
             // resetTargetRotPos();
@@ -193,6 +192,9 @@ public class DarienOpMode extends LinearOpMode{
             omniMotor1.setTargetPosition(encoderPos1);
             omniMotor2.setTargetPosition(encoderPos2);
             omniMotor3.setTargetPosition(encoderPos3);
+        telemetry.addData("finised function 1", "");
+        telemetry.update();    
+            
         }
     }
         telemetry.addData("finised function", "");

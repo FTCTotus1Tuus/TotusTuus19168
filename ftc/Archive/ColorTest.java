@@ -29,8 +29,8 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 
 
-@Autonomous(name="Meet1BlueCorners",group="Linear Opmode") 
-public class Meet1BlueCorners extends LinearOpMode {
+@Autonomous(name="ColorTest",group="NonCompete") 
+public class ColorTest extends LinearOpMode {
     //must be name of file
      // ALL VARIABLES IN THIS CHUNK ARE GLOBAL 
     //Initialize Variables
@@ -105,65 +105,65 @@ public class Meet1BlueCorners extends LinearOpMode {
         // Wait for the driver to start - must press play -- will run until driver presses 
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
 
-       MoveZ(-1800, 0.125);
+    //   MoveZ(-1800, 0.125);
        
-        MoveY(tileDist, 0.125);
-        //move to color cone
-        while (omniMotor0.isBusy()){}
-        //stop, add color sensing code
-       //get parking space
+    //     MoveY(tileDist, 0.125);
+    //     //move to color cone
+    //     while (omniMotor0.isBusy()){}
+    //     //stop, add color sensing code
+    //   //get parking space
        
  
-        parkPos = getParkPos();
-
-        Rotate(500, 0.5);
-        while (omniMotor0.isBusy()){}
-        //back up to pole
-        MoveY(-175, 0.125);
-        while (omniMotor0.isBusy()){}
-        MoveY(-100, 0.11);
-        while (omniMotor0.isBusy()){}
-        // MoveY(5, 0.1);
-        // while (omniMotor0.isBusy()){}
-        sleep(100);
-        //drop cone
-        grabServo.setPower(0.5);
-        sleep(100);
-        //return
-        grabServo.setPower(-0.1);
-        MoveY(275, 0.125);
-        while (omniMotor0.isBusy()){}
-        Rotate(475, 0.5);
         
-        while (omniMotor0.isBusy()){}
-        //GotoParking Space
-        switch(parkPos)
-        {
-            //Green
-            case 1:
-                MoveY(-600, 0.25);
-                break;
-            //Red
-            case 2:
-                MoveY(0, 0.25);
-                break;
-            //Blue
-            case 3:
-                Rotate(-25, 0.5);
-                while (omniMotor0.isBusy()){}
-                MoveY(625, 0.25);
-                break;
-        }
-      while (omniMotor0.isBusy()){}
-        // Rotate(950, 0.33);
-        // while (omniMotor0.isBusy()){}
-        // MoveY(-300, 0.15);
-        wristServo.setPower(-1);
-        sleep(500);
+
+    //     Rotate(500, 0.5);
+    //     while (omniMotor0.isBusy()){}
+    //     //back up to pole
+    //     MoveY(-175, 0.125);
+    //     while (omniMotor0.isBusy()){}
+    //     MoveY(-100, 0.11);
+    //     while (omniMotor0.isBusy()){}
+    //     // MoveY(5, 0.1);
+    //     // while (omniMotor0.isBusy()){}
+    //     sleep(100);
+    //     //drop cone
+    //     grabServo.setPower(0.5);
+    //     sleep(100);
+    //     //return
+    //     grabServo.setPower(-0.1);
+    //     MoveY(275, 0.125);
+    //     while (omniMotor0.isBusy()){}
+    //     Rotate(475, 0.5);
+        
+    //     while (omniMotor0.isBusy()){}
+    //     //GotoParking Space
+    //     switch(parkPos)
+    //     {
+    //         //Green
+    //         case 1:
+    //             MoveY(-600, 0.25);
+    //             break;
+    //         //Red
+    //         case 2:
+    //             MoveY(0, 0.25);
+    //             break;
+    //         //Blue
+    //         case 3:
+    //             Rotate(-25, 0.5);
+    //             while (omniMotor0.isBusy()){}
+    //             MoveY(625, 0.25);
+    //             break;
+    //     }
+    //   while (omniMotor0.isBusy()){}
+    //     // Rotate(950, 0.33);
+    //     // while (omniMotor0.isBusy()){}
+    //     // MoveY(-300, 0.15);
+    //     wristServo.setPower(-1);
+    //     sleep(500);
         // MoveZ(0, 0.125);
     //      MoveY(800,  0.125);
  while (opModeIsActive()){        
-    
+    parkPos = getParkPos();
     this.telemetry.addData("TargetPos", Integer.toString(ZencoderPos));
     this.telemetry.addData("encoder", Integer.toString(linearExtender.getTargetPosition()));
     this.telemetry.addData("alpha", Integer.toString(colorSensor0.alpha()));
@@ -172,29 +172,29 @@ public class Meet1BlueCorners extends LinearOpMode {
     this.telemetry.addData("red: ", Integer.toString(colorSensor0.red()));
     this.telemetry.addData("hue: ", Integer.toString(colorSensor0.argb()));
     this.telemetry.update();
-     
+    
     
  }   }
  
  
     public int getParkPos()
     {
-            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()))
+            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/1.2))
             {
                 telemetry.addData("color", "red");
-                telemetry.update();
+
                 return 2;
             } 
-            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()))
+            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/1.2))
             {
                 telemetry.addData("color", "blue");
-                telemetry.update();
+
                 return 3;
             } 
             else
             {
                 telemetry.addData("color", "green");
-                telemetry.update();
+
                 return 1;
             } 
     }

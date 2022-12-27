@@ -130,21 +130,26 @@ public class ControllerModeGyro extends LinearOpMode{
             telemetry.update();
           
             //stops claw
-            if (!(gamepad1.x | gamepad1.y)){
+            if (gamepad1.x){
+                //targetHeading = getRawHeading();
+                resetHeading();
+            }
+            
+            if (!(gamepad2.x | gamepad2.y)){
                 grabServo.setPower(0);
             }
             //opens claw
-            else if (gamepad1.y){
+            else if (gamepad2.y){
                 grabServo.setPower(-0.35);
             }
             //closes claw
-            else if(gamepad1.x){
+            else if(gamepad2.x){
                 grabServo.setPower(0.35);
             }
-            if (gamepad1.a){
+            if (gamepad2.a){
                 wristServo.setPower(1);
             }
-            else if (gamepad1.b){
+            else if (gamepad2.b){
                 wristServo.setPower(-1);
             }
             else {
@@ -152,7 +157,7 @@ public class ControllerModeGyro extends LinearOpMode{
             }
             
             
-            linearExtender.setPower(-gamepad1.right_stick_y/1.2);
+            linearExtender.setPower(-gamepad2.left_stick_y/1.2);
             
             
             }
@@ -180,7 +185,7 @@ public class ControllerModeGyro extends LinearOpMode{
         
     public void MoveRobotGyro(double[] direction, double rotation){
         
-        robotHeading = getRawHeading() * Math.PI / 180;
+        robotHeading = (getRawHeading() - targetHeading) * Math.PI / 180;
         
         direction2[0] = Math.cos(robotHeading) * direction[0] - Math.sin(robotHeading) * direction[1];
         
@@ -201,6 +206,7 @@ public class ControllerModeGyro extends LinearOpMode{
         telemetry.addData("d2X", direction2[0]);
         telemetry.addData("d2Y", direction2[1]);
         telemetry.addData("ARH", robotHeading);
+        //telemetry.addData("CARH", targetHeading);
         
         
         

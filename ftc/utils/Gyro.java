@@ -37,54 +37,54 @@ import java.io.*;
 import org.firstinspires.ftc.utils.Files;
 
 public class Gyro{
-	
-	BNO055IMU imu;
-	
-	Orientation angles; 	
-	double theta;
-	double tolerance;
-	
-	LinearOpMode main;
-	
-	double EPSILON = 0.00000001;
-	
-	public Gyro(BNO055IMU imu){
-		this.imu = imu;
-	}
+    
+    BNO055IMU imu;
+    
+    Orientation angles;     
+    double theta;
+    double tolerance;
+    
+    LinearOpMode main;
+    
+    double EPSILON = 0.00000001;
+    
+    public Gyro(BNO055IMU imu){
+        this.imu = imu;
+    }
 
-	public double deltaTheta(double rad){
-		this.angles  = this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
-		this.theta = (this.angles.firstAngle);
-		return this.theta - rad;
-	}
-	
-	public double getTheta(){
-		return this.angles.firstAngle;
-	}
-	
-	/*double[] joelEquation(double x, double y){
-		if(y == 0 && x > 0){
-			double theta_a = 0 - getTheta();
-		}
-		else if(y == 0 && x < 0){
-			double thetha = Math.PI - getTheta();
-		}
-		else{
-			double xSquare = Math.pow(x, 2);
-			double ySquare = Math.pow(y, 2);
-		
-			double sqrt_x_y = Math.sqrt(xSquare + ySquare);
-		
-			double theta_a = Math.atan(y/(x + EPSILON)) - getTheta();
-		
-		}
-		
-		if(x > 0){
-				theta_a += Math.PI;
-			}
-		// THETA JOYSTCIK:	 x				   y
-		return sqrt_x_y * Math.cos(theta_a), sqrt_x_y * Math.sin(theta_a);
-		
-	}*/
-	
+    public double deltaTheta(double rad){
+        this.angles  = this.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        this.theta = (this.angles.firstAngle);
+        return this.theta - rad;
+    }
+    
+    public double getTheta(){
+        return this.angles.firstAngle;
+    }
+    
+    /*double[] joelEquation(double x, double y){
+        if(y == 0 && x > 0){
+            double theta_a = 0 - getTheta();
+        }
+        else if(y == 0 && x < 0){
+            double thetha = Math.PI - getTheta();
+        }
+        else{
+            double xSquare = Math.pow(x, 2);
+            double ySquare = Math.pow(y, 2);
+        
+            double sqrt_x_y = Math.sqrt(xSquare + ySquare);
+        
+            double theta_a = Math.atan(y/(x + EPSILON)) - getTheta();
+        
+        }
+        
+        if(x > 0){
+                theta_a += Math.PI;
+            }
+        // THETA JOYSTCIK:     x                   y
+        return sqrt_x_y * Math.cos(theta_a), sqrt_x_y * Math.sin(theta_a);
+        
+    }*/
+    
 }

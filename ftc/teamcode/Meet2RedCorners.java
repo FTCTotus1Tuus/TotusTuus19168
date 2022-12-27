@@ -29,9 +29,9 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 
 
-@Autonomous(name="Meet2BlueCorners",group="Linear Opmode") 
+@Autonomous(name="Meet2RedCorners",group="Linear Opmode") 
 
-public class Meet2BlueCorners extends DarienOpMode{
+public class Meet2RedCorners extends DarienOpMode{
 
 public void runOpMode() {
             
@@ -43,26 +43,30 @@ public void runOpMode() {
         // sleep(500);
         // grabServo.setPower(0);
         MoveZ(-5400, autoPower);
-        //Moves center of the robot to the center of the first tile
-        MoveY(robotCenterAtStart, autoPower);
-        while (omniMotor0.isBusy()){}
-        sleep(100);
+        //Moves center of the robot to the center of the y axis of the field
+        MoveY(robotCenterAtStart + tileDist, autoPower);
         //move to color cone
-        MoveY(tileDist, autoPower);
         while (omniMotor0.isBusy()){}
-        // sleep(200);
         sleep(100);
+        // sleep(100);
+        // MoveY(tileDist, autoPower);
+        // while (omniMotor0.isBusy()){}
+        // sleep(200);
+        
+        // read color
         parkPos = getParkPos();
+        
+        // move to pile-on tile
         MoveY(tileDist, autoPower);
         while(omniMotor0.isBusy()){}
-        // sleep(200);
         sleep(100);
-        while (omniMotor0.isBusy()){}
+        // sleep(200);
+        // while (omniMotor0.isBusy()){}
         MoveY(tileDist/2 , autoPower);
         while(omniMotor0.isBusy()){}
         sleep(100);
+        // sleep(100);
         MoveY(-tileDist/2 , autoPower);
-        sleep(100);
         while(omniMotor0.isBusy()){}
         // MoveY(250,autoPower);
         // sleep(100);
@@ -72,41 +76,40 @@ public void runOpMode() {
         //MoveZ(800, 0.125);
         //while(linearExtender.isBusy()){}
         
-        Rotate(225);
+        Rotate(125);
         while(omniMotor0.isBusy()){}
         sleep(100);
-        MoveY(-310,autoPower);
+        MoveY(-320,autoPower);
         while(omniMotor0.isBusy()){}
         sleep(100);
-        MoveY(10, autoPower);
+        MoveY(5, autoPower);
         while(omniMotor0.isBusy()){}
         MoveZ(-3200, 0.3);
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.35);
-        // sleep(1500);
         sleep(300);
         grabServo.setPower(0);
-        MoveY(300,autoPower);
+        MoveY(305,autoPower);
         sleep(100);
         while(omniMotor0.isBusy()){}
-        Rotate(270);
+        Rotate(90);
         while(omniMotor0.isBusy()){}
-        
-        switch(parkPos)
-        {
-            //Green
-            case 1:
-                MoveY(-625, 0.25);
-                break;
-            //Red
-            case 2:
-                MoveY(0, 0.25);
-                break;
-            //Blue
-            case 3:
-                MoveY(625, 0.25);
-                break;
-        }
+        moveToConeStack();
+        // switch(parkPos)
+        // {
+        //     //Green
+        //     case 1:
+        //         MoveY(625, 0.25);
+        //         break;
+        //     //Red
+        //     case 2:
+        //         MoveY(0, 0.25);
+        //         break;
+        //     //Blue
+        //     case 3:
+        //         MoveY(-625, 0.25);
+        //         break;
+        // }
         // while (omniMotor0.isBusy()){}
         //stop, add color sensing code
        //get parking space
@@ -133,7 +136,7 @@ public void runOpMode() {
     //     RotateOld(475, 0.5);
         
     //     while (omniMotor0.isBusy()){}
-    //     //GotoParking Space
+    //  GotoParking Space
     //     switch(parkPos)
     //     {
     //         //Green
