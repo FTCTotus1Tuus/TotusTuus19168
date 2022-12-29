@@ -39,56 +39,30 @@ public void runOpMode() {
         
         // Wait for the driver to start - must press play -- will run until driver presses 
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
-        // grabServo.setPower(0.35);
-        // sleep(500);
-        // grabServo.setPower(0);
-        MoveZ(-5400, autoPower);
+        grabServo.setPower(0.05); //closes the grab servo as a safety measure
+        MoveZ(-5400, armPower); // moves the arm up
         //Moves center of the robot to the center of the first tile
-        MoveY(robotCenterAtStart, autoPower);
-        while (omniMotor0.isBusy()){}
-        sleep(100);
-        //move to color cone
-        MoveY(tileDist, autoPower);
-        while (omniMotor0.isBusy()){}
-        // sleep(200);
-        sleep(100);
-        parkPos = getParkPos();
-        MoveY(tileDist, autoPower);
-        while(omniMotor0.isBusy()){}
-        // sleep(200);
-        sleep(100);
-        while (omniMotor0.isBusy()){}
-        MoveY(tileDist/2 , autoPower);
-        while(omniMotor0.isBusy()){}
-        sleep(100);
-        MoveY(-tileDist/2 , autoPower);
-        sleep(100);
-        while(omniMotor0.isBusy()){}
-        // MoveY(250,autoPower);
-        // sleep(100);
-        // while(omniMotor0.isBusy()){}
-        // Rotate(270);
-        // while(omniMotor0.isBusy()){}
-        //MoveZ(800, 0.125);
-        //while(linearExtender.isBusy()){}
+        MoveY(robotCenterAtStart + 2*tileDist + 2*tileDist/5 - 20, autoPower); 
+        //8750 is the ratio for how long you have to wait to detect color on any given power
+        sleep((long) Math.floor((8750 * autoPower) + 0.5));
+        parkPos = getParkPos(); //reads signal cone
+        grabServo.setPower(0); // stop squeezing the claw
+        waitForMotors();
+        MoveY(-2*tileDist/5 + 90, autoPower); //backs up to center of high pole tile
+        waitForMotors();
         
-        Rotate(225);
-        while(omniMotor0.isBusy()){}
-        sleep(100);
-        MoveY(-310,autoPower);
-        while(omniMotor0.isBusy()){}
-        sleep(100);
-        MoveY(10, autoPower);
-        while(omniMotor0.isBusy()){}
-        MoveZ(-3200, 0.3);
-        while(linearExtender.isBusy()){}
-        grabServo.setPower(-0.35);
-        // sleep(1500);
-        sleep(300);
-        grabServo.setPower(0);
-        MoveY(300,autoPower);
-        sleep(100);
-        while(omniMotor0.isBusy()){}
+        //Start loop to stack cones on high
+        for (int i=0; i<conesMax; i++) {
+            dropBlueCone();
+            
+            Rotate(265); //turn towards stack
+            waitForMotors();
+            MoveZ(-570 + (i*165), armPower); //lower arm
+            moveToConeStack();
+        //finished grabbing cone. Placing on high pole
+        }
+        dropBlueCone();
+        //parks
         Rotate(270);
         while(omniMotor0.isBusy()){}
         
@@ -96,7 +70,7 @@ public void runOpMode() {
         {
             //Green
             case 1:
-                MoveY(-625, 0.25);
+                MoveY(-615, 0.25);
                 break;
             //Red
             case 2:
@@ -104,12 +78,58 @@ public void runOpMode() {
                 break;
             //Blue
             case 3:
-                MoveY(625, 0.25);
+                MoveY(615, 0.25);
                 break;
         }
+        while (omniMotor0.isBusy()){}
+        // Rotate(225);
+        // MoveY(-320, autoPower);
+        // MoveZ(-3000, armPower);
+        // waitForMotors();
+        // while(linearExtender.isBusy()){}
+        // grabServo.setPower(-0.35);
+        // sleep(300);
+        // grabServo.setPower(0);
+        
+        // sleep(100);
+        // //move to color cone
+        // MoveY(tileDist, autoPower);
         // while (omniMotor0.isBusy()){}
-        //stop, add color sensing code
-       //get parking space
+        // // sleep(200);
+        // sleep(100);
+        // parkPos = getParkPos();
+        // MoveY(tileDist, autoPower);
+        // while(omniMotor0.isBusy()){}
+        // // sleep(200);
+        // sleep(100);
+        // while (omniMotor0.isBusy()){}
+        // MoveY(tileDist/2 , autoPower);
+        // while(omniMotor0.isBusy()){}
+        // sleep(100);
+        // MoveY(-tileDist/2 , autoPower);
+        // sleep(100);
+        // while(omniMotor0.isBusy()){}
+        // // MoveY(250,autoPower);
+        // // sleep(100);
+        // // while(omniMotor0.isBusy()){}
+        // // Rotate(270);
+        // // while(omniMotor0.isBusy()){}
+        
+        // Rotate(225);
+        // while(omniMotor0.isBusy()){}
+        // sleep(100);
+        // MoveY(-310,autoPower);
+        // while(omniMotor0.isBusy()){}
+        // sleep(100);
+        // MoveY(10, autoPower);
+        // while(omniMotor0.isBusy()){}
+        // MoveZ(-3200, 0.3);
+        // while(linearExtender.isBusy()){}
+        // MoveY(300,autoPower);
+        // sleep(100);
+        // while(omniMotor0.isBusy()){}
+    //     stop, add color sensing code
+    //   get parking space
        
  
 
@@ -162,7 +182,7 @@ public void runOpMode() {
  while (opModeIsActive()){        
     
     this.telemetry.addData("TargetPos", Integer.toString(ZencoderPos));
-    this.telemetry.addData("encoder", Integer.toString(linearExtender.getTargetPosition()));
+    this.telemetry.addData("encoder", Integer.toString(linearExtender.getCurrentPosition()));
     this.telemetry.addData("alpha", Integer.toString(colorSensor0.alpha()));
     this.telemetry.addData("blue: ", Integer.toString(colorSensor0.blue()));
     this.telemetry.addData("green: ", Integer.toString(colorSensor0.green()));
@@ -171,6 +191,24 @@ public void runOpMode() {
     this.telemetry.addData("Rotation: ", Double.toString(getRawHeading()));
     this.telemetry.update();
  
- }   }
+    }   
+}
+    private void dropBlueCone() {
+        //starts at the center of the high pole tile drops the cone on that pole.
+        Rotate(225); //turn towards high pole
+        waitForMotors();
+        MoveY(-320, autoPower); //push towards pole
+        waitForMotors();
+        MoveZ(-3000, armPower); //lower linear extender
+        while(linearExtender.isBusy()){}
+        grabServo.setPower(-0.55); //open claw to drop cone
+        sleep(50);
+        Rotate(225); //re-allign robot
+        waitForMotors();
+        MoveY(255, autoPower); //back up to center of tile
+        sleep(125);
+        grabServo.setPower(0); //stop opening claw
+        waitForMotors();
+    }
 
 }
