@@ -182,19 +182,24 @@ public class RotationTest extends LinearOpMode {
         omniMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         omniMotor3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
-    public void Rotate(int heading)
+     public void Rotate(int heading)
     {   
-    while (!omniMotor0.isBusy()){
-        if (heading > 180){
-            rotateDirection = 1;
-        }
-        else {
-            rotateDirection = -1;
-        }
+    telemetry.addData("starting rotate function", "");
+    telemetry.update();
+    boolean isRotating = true;
+    if (getRawHeading() - heading > 0){
+        rotateDirection = 1;
+    }
+    else {
+        rotateDirection = -1;
+    }
         setToRotateRunMode();
-        setRotatePower(0.25, rotateDirection);
+        setRotatePower(0.35, rotateDirection);
+    while (isRotating){
         
-        if (Math.abs(getRawHeading() - heading) <= 5.75) {
+        
+        if (Math.abs(5.75 + getRawHeading() - heading) <= 5.75) {
+            // resetTargetRotPos();
             encoderPos0 = omniMotor0.getCurrentPosition();
             encoderPos1 = omniMotor1.getCurrentPosition();
             encoderPos2 = omniMotor2.getCurrentPosition();
@@ -204,8 +209,11 @@ public class RotationTest extends LinearOpMode {
             omniMotor1.setTargetPosition(encoderPos1);
             omniMotor2.setTargetPosition(encoderPos2);
             omniMotor3.setTargetPosition(encoderPos3);
+            isRotating = false;
+        telemetry.addData("finised function 1", "");
+        telemetry.update();    
+            
         }
-        
     }
         
     }
