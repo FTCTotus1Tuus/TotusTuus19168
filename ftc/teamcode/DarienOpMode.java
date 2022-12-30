@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode;
+
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -12,13 +13,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-//import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-
 import com.qualcomm.robotcore.hardware.HardwareMap;
-
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -41,59 +39,61 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 @Autonomous
 
 public class DarienOpMode extends LinearOpMode{
-      //must be name of file
-     // ALL VARIABLES IN THIS CHUNK ARE GLOBAL 
+              // ^ must be name of file
+     
     //Initialize Variables
-    public final double SCALE_FACTOR = 255;
 
     // For Movement
     // int, float, double 
     public double[] direction = {0.0,0.0};
+    public int encoderPos =0;
+    public int ZencoderPos =0;
     public double rotation;
     
-       private BNO055IMU       imu;  
-       public int encoderPos =0;
-       public int encoderPos0,encoderPos1,encoderPos2,encoderPos3 =0;
-       public int ZencoderPos =0;
-       public double cos = Math.cos((Math.PI)/4);
-       public double constMult = (48 * 2 * (Math.PI));
-       public double constant = 537.7 / constMult;
-       public double rotateDirection;
-       public int tileDist = 600;
-       //600?
-       //changed to 600 to move 1 tile
-       public int robotLength = 420;
-       //Distance to the center of the first tile at start
-       public int robotCenterAtStart = tileDist/2 - robotLength/2;
-       public double autoPower = .15;
-       //set arm dist to 600 as well
-    // INITIALIZATION ROBOT PARTS
+        // ODOMETRY
+            public double cos = Math.cos((Math.PI)/4);
+            public double constMult = (48 * 2 * (Math.PI));
+            public double constant = 537.7 / constMult;
+    
+    
+    // GYRO ROTATION
+        private BNO055IMU       imu;  
+        public int encoderPos0,encoderPos1,encoderPos2,encoderPos3 =0;
+        public double rotateDirection;
+    
+    
+    // MOVEMENT CONSTANTS
+        public int tileDist = 600;
+        public int robotLength = 420;
+        public int robotCenterAtStart = tileDist/2 - robotLength/2; //Distance to the center of the first tile at start
+        public double autoPower = .25;
+        public double armPower = .45;
+        public int conesMax = 1;
+    
+    
+    // INITIALIZATION OF ROBOT PARTS
 
-    // Motor 
-    public DcMotor omniMotor0; // front left
-    public DcMotor omniMotor1; // front right
-    public DcMotor omniMotor2; // back left
-    public DcMotor omniMotor3; // back right
+        // WHEEL MOTORS 
+            public DcMotor omniMotor0; // front left
+            public DcMotor omniMotor1; // front right
+            public DcMotor omniMotor2; // back left
+            public DcMotor omniMotor3; // back right
+    
+        // ARM/CLAW MOTORS
+            public DcMotor linearExtender; // claw height
+            public CRServo grabServo; // claw open
+            public CRServo wristServo; // claw direction
     
     
-    //public DcMotor omnimotor4 = initializeMotor("linearExtender");    
-    public DcMotor linearExtender; // claw height
+    // PARKING
     
-    public CRServo grabServo; // claw open
-    public CRServo wristServo; // claw direction
-    
-    public ColorSensor colorSensor0;
-    
-    public double match_start_time;
-    
-    public int parkPos;
+        public ColorSensor colorSensor0;
+        public int parkPos;
    
-    
-        // initColorSensors();
-        // initColorSensors();
-    
    public void initialize() {
-       omniMotor0 = initializeMotor("omniMotor0");
+       
+       
+        omniMotor0 = initializeMotor("omniMotor0");
         omniMotor1 = initializeMotor("omniMotor1");
         omniMotor2 = initializeMotor("omniMotor2");
         omniMotor3 = initializeMotor("omniMotor3");
@@ -101,7 +101,7 @@ public class DarienOpMode extends LinearOpMode{
         colorSensor0 = hardwareMap.get(ColorSensor.class, "colorSensor0");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
-        
+        grabServo.setDirection(CRServo.Direction.REVERSE);
         omniMotor0.setDirection(DcMotor.Direction.REVERSE);
         omniMotor1.setDirection(DcMotor.Direction.FORWARD);
         omniMotor2.setDirection(DcMotor.Direction.REVERSE);
@@ -149,11 +149,21 @@ public class DarienOpMode extends LinearOpMode{
         // Rotate(270);
         // while(omniMotor0.isBusy()){}
         // sleep(100);
-        MoveY(2*tileDist + robotCenterAtStart,autoPower);
-        while(omniMotor0.isBusy());{}
-        wristServo.setPower(-1);
-        sleep(900);
-        wristServo.setPower(0);
+        MoveY(tileDist + robotCenterAtStart,autoPower); // robot to conestack
+        wristServo.setPower(-1); // wrist towards conestack
+        sleep(750);
+        wristServo.setPower(0); //turn off wrist servo
+        waitForMotors();
+        grabServo.setPower(1); // close grabber with gusto
+        sleep(750);
+        grabServo.setPower(0); // stop closing grabber
+        MoveZ(-5400, armPower); //move Linear Extender up
+        sleep(500);
+        
+        MoveY(-(tileDist + robotCenterAtStart), autoPower); //move away from conestack
+        wristServo.setPower(1);
+        sleep(750);
+        waitForMotors();
     }
     public void RotateOld(int rotation, double power)
     {
@@ -170,16 +180,17 @@ public class DarienOpMode extends LinearOpMode{
     {   
     telemetry.addData("starting rotate function", "");
     telemetry.update();
-    while (!omniMotor0.isBusy()){
-        if (getRawHeading() - heading > 0){
-            rotateDirection = 1;
-        }
-        else {
-            rotateDirection = -1;
-        }
-        
+    boolean isRotating = true;
+    if (getRawHeading() - heading > 0){
+        rotateDirection = 1;
+    }
+    else {
+        rotateDirection = -1;
+    }
         setToRotateRunMode();
-        setRotatePower(0.4, rotateDirection);
+        setRotatePower(0.35, rotateDirection);
+    while (isRotating){
+        
         
         if (Math.abs(5.75 + getRawHeading() - heading) <= 5.75) {
             // resetTargetRotPos();
@@ -192,6 +203,7 @@ public class DarienOpMode extends LinearOpMode{
             omniMotor1.setTargetPosition(encoderPos1);
             omniMotor2.setTargetPosition(encoderPos2);
             omniMotor3.setTargetPosition(encoderPos3);
+            isRotating = false;
         telemetry.addData("finised function 1", "");
         telemetry.update();    
             
@@ -319,7 +331,11 @@ public class DarienOpMode extends LinearOpMode{
     omniMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     omniMotor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
    }
-   
+    
+    public void waitForMotors()
+    {
+        while (omniMotor0.isBusy() && omniMotor1.isBusy() && omniMotor2.isBusy() && omniMotor3.isBusy()){}
+    }
    
    
 //   public void controllerTest()
@@ -368,17 +384,6 @@ public class DarienOpMode extends LinearOpMode{
 //     }
 //   }
    
-     public double getMatchTime(){
-        return this.time - match_start_time;
-    }
-    
-    public boolean isEndGame(){
-        if(getMatchTime() < 90){
-            return false;
-        }
-        return true;
-    }
-    
     int move_to_position;
     double y;
     
