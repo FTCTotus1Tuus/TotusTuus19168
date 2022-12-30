@@ -84,7 +84,7 @@ public class ControllerModeGyro extends LinearOpMode{
         linearExtender = initializeMotor("linearExtender");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
-        grabServo.setDirection(CRServo.Direction.FORWARD);
+        grabServo.setDirection(CRServo.Direction.REVERSE);
         
         
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();

@@ -76,7 +76,7 @@ public class ControllerMode extends LinearOpMode{
         linearExtender = initializeMotor("linearExtender");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
-        grabServo.setDirection(CRServo.Direction.FORWARD);
+        grabServo.setDirection(CRServo.Direction.REVERSE);
         
         Files.test("org.firstinspires.ftc/teamcode/AutonomousData.txt", this);
         
