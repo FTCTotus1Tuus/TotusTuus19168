@@ -28,7 +28,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 
-@Autonomous(name="Meet1RedCorners",group="Linear Opmode") 
+@Autonomous(name="Meet1RedCorners",group="NonCompete") 
 public class Meet1RedCorners extends LinearOpMode {
     //must be name of file
      // ALL VARIABLES IN THIS CHUNK ARE GLOBAL 

@@ -66,7 +66,7 @@ public class DarienOpMode extends LinearOpMode{
         public int tileDist = 600;
         public int robotLength = 420;
         public int robotCenterAtStart = tileDist/2 - robotLength/2; //Distance to the center of the first tile at start
-        public double autoPower = .25;
+        public double autoPower = .15;
         public double armPower = .45;
         public int conesMax = 1;
     
@@ -101,7 +101,7 @@ public class DarienOpMode extends LinearOpMode{
         colorSensor0 = hardwareMap.get(ColorSensor.class, "colorSensor0");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
-        grabServo.setDirection(CRServo.Direction.REVERSE);
+        grabServo.setDirection(CRServo.Direction.FORWARD);
         omniMotor0.setDirection(DcMotor.Direction.REVERSE);
         omniMotor1.setDirection(DcMotor.Direction.FORWARD);
         omniMotor2.setDirection(DcMotor.Direction.REVERSE);

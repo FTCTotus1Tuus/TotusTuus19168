@@ -142,7 +142,7 @@ public class ControllerMode extends LinearOpMode{
     
         
    
-    double div_by = 2;
+    double div_by = 1.3;
     public void MoveRobot(double[] direction, double rotation){
         
         double wheel0 = clamp(-direction[0] + direction[1] - rotation, -1, 1);

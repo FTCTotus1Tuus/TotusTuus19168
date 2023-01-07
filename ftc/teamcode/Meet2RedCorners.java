@@ -29,7 +29,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 
 
-@Autonomous(name="Meet2RedCorners",group="Linear Opmode") 
+@Autonomous(name="Meet2RedCorners",group="NonCompete") 
 
 public class Meet2RedCorners extends DarienOpMode{
 

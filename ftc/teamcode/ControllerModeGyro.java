@@ -132,7 +132,8 @@ public class ControllerModeGyro extends LinearOpMode{
             //stops claw
             if (gamepad1.x){
                 //targetHeading = getRawHeading();
-                resetHeading();
+                targetHeading = getRawHeading();
+                telemetry.addData("RESET BASE ANGLE (Gamepad_1:X)",0);
             }
             
             if (!(gamepad2.x | gamepad2.y)){
