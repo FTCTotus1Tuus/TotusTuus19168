@@ -65,15 +65,15 @@ public class Meet3BlueCorners extends DarienOpMode{
         {
             //Green
             case 1:
-                MoveY(-615, 0.25);
+                MoveY(-615, 0.3);
                 break;
             //Red
             case 2:
-                MoveY(0, 0.25);
+                MoveY(0, 0.3);
                 break;
             //Blue
             case 3:
-                MoveY(615, 0.25);
+                MoveY(615, 0.3);
                 break;
         }
         waitForMotors();
@@ -96,10 +96,11 @@ public class Meet3BlueCorners extends DarienOpMode{
         //starts at the center of the high pole tile drops the cone on that pole.
         Rotate(225); //turn towards high pole
         waitForMotors();
-        MoveY(-320, autoPower); //push towards pole
+        MoveY(-455, autoPower - 0.03); //push towards pole
         waitForMotors();
-        MoveY(20, autoPower);
+        MoveY(17, 0.1);
         waitForMotors();
+        sleep(300);
         MoveZ(-3000, armPower); //lower linear extender
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.55); //open claw to drop cone

@@ -37,13 +37,13 @@ public class Meet3RedCorners extends DarienOpMode{
         grabServo.setPower(0.55); //closes the grab servo as a safety measure
         MoveZ(-5400, armPower); // moves the arm up
         //Moves center of the robot to the center of the first tile
-        MoveY(robotCenterAtStart + 2*tileDist + 2*tileDist/5 + 20, autoPower); 
+        MoveY(robotCenterAtStart + 2*tileDist + 2*tileDist/5 + 40, autoPower); 
         //8750 is the ratio for how long you have to wait to detect color on any given power
         sleep(2200);
         grabServo.setPower(0.1); // stop squeezing the claw
         parkPos = getParkPos(); //reads signal cone
         waitForMotors();
-        MoveY(-2*tileDist/5 - 20, autoPower); //backs up to center of high pole tile
+        MoveY(-2*tileDist/5 - 25, autoPower); //backs up to center of high pole tile
         waitForMotors();
         
         //Start loop to stack cones on high
@@ -53,7 +53,7 @@ public class Meet3RedCorners extends DarienOpMode{
             Rotate(91); //turn towards stack
             waitForMotors();
             MoveZ(-600 + (i*165), armPower-0.1);//lower arm
-            MoveY(20, autoPower);
+            MoveY(50, autoPower);
             waitForMotors();
             moveToConeStack();
         //finished grabbing cone. Placing on high pole
@@ -67,15 +67,15 @@ public class Meet3RedCorners extends DarienOpMode{
         {
             //Green
             case 1:
-                MoveY(615, 0.25);
+                MoveY(615, 0.3);
                 break;
             //Red
             case 2:
-                MoveY(0, 0.25);
+                MoveY(0, 0.3);
                 break;
             //Blue
             case 3:
-                MoveY(-615, 0.25);
+                MoveY(-615, 0.3);
                 break;
         }
         waitForMotors();
@@ -96,19 +96,20 @@ public class Meet3RedCorners extends DarienOpMode{
     }
     private void dropRedCone() {
         //starts at the center of the high pole tile drops the cone on that pole.
-        Rotate(137); //turn towards high pole
+        Rotate(135); //turn towards high pole
         waitForMotors();
-        MoveY(-370, autoPower); //push towards pole
+        MoveY(-455, autoPower - 0.03); //push towards pole
         waitForMotors();
-        MoveY(15, autoPower);
+        MoveY(17, 0.1); // move slightly from the pole
         waitForMotors();
+        sleep(300);
         MoveZ(-3000, armPower); //lower linear extender
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.55); //open claw to drop cone
         sleep(50);
         Rotate(135); //re-allign robot
         waitForMotors();
-        MoveY(240, autoPower); //back up to center of tile
+        MoveY(258, autoPower); //back up to center of tile
         sleep(125);
         grabServo.setPower(0); //stop opening claw
         waitForMotors();

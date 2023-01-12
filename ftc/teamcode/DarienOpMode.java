@@ -149,7 +149,7 @@ public class DarienOpMode extends LinearOpMode{
         // Rotate(270);
         // while(omniMotor0.isBusy()){}
         // sleep(100);
-        MoveY(tileDist + robotCenterAtStart,autoPower); // robot to conestack
+        MoveY(tileDist + robotCenterAtStart,autoPower + 0.05); // robot to conestack
         wristServo.setPower(-1); // wrist towards conestack
         sleep(750);
         wristServo.setPower(0); //turn off wrist servo
