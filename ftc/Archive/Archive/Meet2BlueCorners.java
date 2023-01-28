@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.Archive;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.robot.Robot;
@@ -24,9 +24,9 @@ import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
-@Autonomous(name="Meet3BlueCorners",group="NonCompete") 
+@Autonomous(name="Meet2BlueCorners",group="NonCompete") 
 
-public class Meet3BlueCorners extends DarienOpMode{
+public class Meet2BlueCorners extends DarienOpMode2{
 
     public void runOpMode() {
             
@@ -50,7 +50,7 @@ public class Meet3BlueCorners extends DarienOpMode{
         for (int i=0; i<conesMax; i++) {
             dropBlueCone();
             
-            Rotate(270); //turn towards stack
+            Rotate(271); //turn towards stack
             waitForMotors();
             MoveZ(-570 + (i*165), armPower); //lower arm
             moveToConeStack();
@@ -65,15 +65,15 @@ public class Meet3BlueCorners extends DarienOpMode{
         {
             //Green
             case 1:
-                MoveY(-615, 0.5);
+                MoveY(-615, 0.25);
                 break;
             //Red
             case 2:
-                MoveY(0, 0.5);
+                MoveY(0, 0.25);
                 break;
             //Blue
             case 3:
-                MoveY(615, 0.5);
+                MoveY(615, 0.25);
                 break;
         }
         waitForMotors();
@@ -96,18 +96,15 @@ public class Meet3BlueCorners extends DarienOpMode{
         //starts at the center of the high pole tile drops the cone on that pole.
         Rotate(225); //turn towards high pole
         waitForMotors();
-        MoveY(-455, autoPower - 0.03); //push towards pole
+        MoveY(-320, autoPower); //push towards pole
         waitForMotors();
-        MoveY(17, 0.1);
-        waitForMotors();
-        sleep(300);
         MoveZ(-3000, armPower); //lower linear extender
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.55); //open claw to drop cone
         sleep(50);
         Rotate(225); //re-allign robot
         waitForMotors();
-        MoveY(235, autoPower); //back up to center of tile
+        MoveY(255, autoPower); //back up to center of tile
         sleep(125);
         grabServo.setPower(0); //stop opening claw
         waitForMotors();
