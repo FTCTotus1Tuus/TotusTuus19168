@@ -135,12 +135,13 @@ public class ControllerModeTest extends LinearOpMode{
                 linearExtender.setTargetPosition(0);
                 linearExtender.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 linearExtender.setPower(-1);
-                wristServo.setPower(1);
+                wristServo.setPower(-1);
             }
-            else if (gamepad2.back == false && Math.abs(gamepad2.left_stick_y) < 0)
+            else if (gamepad2.back == false && Math.abs(gamepad2.left_stick_y) < 0.1)
             {
                 linearExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 linearExtender.setPower(0);
+                wristServo.setPower(0);
             }
             
             if(Math.abs(gamepad2.left_stick_y) > 0.1)
