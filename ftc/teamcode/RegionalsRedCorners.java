@@ -68,7 +68,7 @@ public class RegionalsRedCorners extends DarienOpMode{
         {
             //Blue
             case 3:
-                MoveY(-615, 0.3);
+                MoveY(615, 0.3);
                 break;
             //Red
             case 2:
@@ -76,7 +76,7 @@ public class RegionalsRedCorners extends DarienOpMode{
                 break;
             //Green
             case 1:
-                MoveY(615, 0.3);
+                MoveY(-615, 0.3);
                 break;
         }
         waitForMotors();
@@ -109,7 +109,7 @@ public class RegionalsRedCorners extends DarienOpMode{
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.55); //open claw to drop cone
         sleep(50);
-        Rotate(45); //re-allign robot
+        Rotate(315); //re-allign robot
         waitForMotors();
         MoveY(-283, autoPower); //back up to center of tile
         sleep(125);
