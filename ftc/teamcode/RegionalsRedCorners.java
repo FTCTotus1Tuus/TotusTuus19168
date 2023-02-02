@@ -45,7 +45,8 @@ public class RegionalsRedCorners extends DarienOpMode{
         // grabServo.setPower(0.1); // stop squeezing the claw
         parkPos = getParkPos(); //reads signal cone
         waitForMotors();
-        MoveY(-2*tileDist/5 + 40 , autoPower); //backs up to center of high pole tile
+        // MoveY(-2*tileDist/5 + 40 , autoPower); //backs up to center of high pole tile
+        MoveY(-2*tileDist/5, autoPower); //backs up to center of high pole tile
         waitForMotors();
         
         //Start loop to stack cones on high
@@ -65,17 +66,17 @@ public class RegionalsRedCorners extends DarienOpMode{
         
         switch(parkPos)
         {
-            //Green
+            //Blue
             case 3:
-                MoveY(615, 0.3);
+                MoveY(-615, 0.3);
                 break;
             //Red
             case 2:
                 MoveY(0, 0.3);
                 break;
-            //Blue
+            //Green
             case 1:
-                MoveY(-615, 0.3);
+                MoveY(615, 0.3);
                 break;
         }
         waitForMotors();
@@ -98,8 +99,9 @@ public class RegionalsRedCorners extends DarienOpMode{
         //starts at the center of the high pole tile drops the cone on that pole.
         Rotate(315); //turn towards high pole
         waitForMotors();
-        MoveY(320, autoPower - 0.03); //push towards pole
+        MoveY(350, autoPower - 0.03); //push towards pole
         waitForMotors();
+        sleep(100);
         MoveY(-17, 0.1); // move slightly from the pole
         waitForMotors();
         sleep(300);
@@ -107,9 +109,9 @@ public class RegionalsRedCorners extends DarienOpMode{
         while(linearExtender.isBusy()){}
         grabServo.setPower(-0.55); //open claw to drop cone
         sleep(50);
-        Rotate(315); //re-allign robot
+        Rotate(45); //re-allign robot
         waitForMotors();
-        MoveY(-295, autoPower); //back up to center of tile
+        MoveY(-283, autoPower); //back up to center of tile
         sleep(125);
         grabServo.setPower(0); //stop opening claw
         waitForMotors();

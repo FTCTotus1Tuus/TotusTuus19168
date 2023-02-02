@@ -15,9 +15,9 @@ import java.util.*;
 import java.io.*;
 
 import org.firstinspires.ftc.utils.Files;
-@TeleOp(name="ControllerMode",group="Linear Opmode")
+@TeleOp(name="ControllerModeTest",group="NonCompete")
 
-public class ControllerMode extends LinearOpMode{
+public class ControllerModeTest extends LinearOpMode{
     //Initialize Variables
     Hashtable<String, List<Double>> motorPowerLogs = new Hashtable<String, List<Double>>();
     Boolean replaying = false;
@@ -100,6 +100,8 @@ public class ControllerMode extends LinearOpMode{
             telemetry.addData("gamepad1.left_stick_y", gamepad1.left_stick_y);
             telemetry.addData("gamepad1.right_stick_x", gamepad1.right_stick_x);
             telemetry.addData("gamepad1.left_trigger", gamepad1.left_trigger);
+            telemetry.addData("Lin-Extender Pos: ", Integer.toString(linearExtender.getCurrentPosition()));
+            
             /*telemetry.addData("overTapeBlue", overTapeBlue());
             telemetry.addData("overTapeRed", overTapeRed());*/
             
@@ -125,13 +127,27 @@ public class ControllerMode extends LinearOpMode{
             else if (gamepad2.b){
                 wristServo.setPower(-1);
             }
-            else {
+            if (!(gamepad2.x | gamepad2.y | gamepad2.back)){
                 wristServo.setPower(0);
             }
+            if (gamepad2.back) // Moves slider all the way down and moves wrist to front
+            {
+                linearExtender.setTargetPosition(0);
+                linearExtender.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                linearExtender.setPower(-1);
+                wristServo.setPower(1);
+            }
+            else if (gamepad2.back == false && Math.abs(gamepad2.left_stick_y) < 0)
+            {
+                linearExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                linearExtender.setPower(0);
+            }
             
-            
-            linearExtender.setPower(-gamepad2.left_stick_y/1.2);
-            
+            if(Math.abs(gamepad2.left_stick_y) > 0.1)
+            {
+                linearExtender.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                linearExtender.setPower(-gamepad2.left_stick_y/1.2);
+            }
             
             }
         }

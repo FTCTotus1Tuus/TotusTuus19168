@@ -63,9 +63,10 @@ public class DarienOpMode extends LinearOpMode{
         
     
     // MOVEMENT CONSTANTS
+        public int insideTileDist = 578; // Distance between the inside edges of the tile
         public int tileDist = 600;
         public int robotLength = 430;
-        public int robotCenterAtStart = tileDist/2 - robotLength/2; //Distance to the center of the first tile at start
+        public int robotCenterAtStart = insideTileDist/2 - robotLength/2; //Distance to the center of the first tile at start
         public double autoPower = .15;
         public double armPower = .75;
         public int conesMax = 1;
@@ -313,18 +314,18 @@ public class DarienOpMode extends LinearOpMode{
     }
    public void setPower(double power)
    {
-       omniMotor0.setPower(power);
-       omniMotor1.setPower(power);
-       omniMotor2.setPower(power);
-       omniMotor3.setPower(power);
+       omniMotor0.setPower(relativePower(power));
+       omniMotor1.setPower(relativePower(power));
+       omniMotor2.setPower(relativePower(power));
+       omniMotor3.setPower(relativePower(power));
        
    }
    
    public void setRotatePower(double power, double direction){
-        omniMotor0.setPower(direction*power);
-        omniMotor1.setPower(-direction*power);
-        omniMotor2.setPower(direction*power);
-        omniMotor3.setPower(-direction*power);
+        omniMotor0.setPower(relativePower(direction*power));
+        omniMotor1.setPower(relativePower(-direction*power));
+        omniMotor2.setPower(relativePower(direction*power));
+        omniMotor3.setPower(relativePower(-direction*power));
         
     }
     
@@ -405,9 +406,9 @@ public class DarienOpMode extends LinearOpMode{
         telemetry.update();
     }
 
-    public double relative_power(double intended_power)
+    public double relativePower(double intended_power)
     {
-        return (13 * intended_power) / 13; //getVoltage()
+        return (13 * intended_power) / getVoltage();
     }
     
     boolean going_to_interpolate = false;
