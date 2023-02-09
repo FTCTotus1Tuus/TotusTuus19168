@@ -107,19 +107,13 @@ public class ControllerMode extends LinearOpMode{
             //telemetry.addData("armPowerWithChange", armPowerWithChange);
             telemetry.update();
           
-            //stops claw
-            if (!(gamepad2.x | gamepad2.y)){
-                grabServo.setPower(0);
-            }
-            //opens claw
-            else if (gamepad2.y){
-                grabServo.setPower(-0.35);
-            }
-            //closes claw
-            else if(gamepad2.x){
-                grabServo.setPower(0.35);
-            }
-            if (gamepad2.a){
+            int claw_power = (gamepad2.y) ? 1 : -1;
+          
+
+            //sets power for the claw
+            grabServo.setPower(claw_power);
+            
+            if (gamepad2.x){
                 wristServo.setPower(1);
             }
             else if (gamepad2.b){
