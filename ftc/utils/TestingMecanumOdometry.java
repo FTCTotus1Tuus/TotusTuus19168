@@ -31,7 +31,7 @@ import java.util.*;
 import java.io.*;
 import java.util.*;
 import java.io.*;
-@TeleOp(name="TestingMecanumOdometry",group="Linear Opmode")
+// @TeleOp(name="TestingMecanumOdometry",group="Linear Opmode")
 public class TestingMecanumOdometry extends LinearOpMode{
     //Initialize Variables
     Hashtable<String, List<Double>> motorPowerLogs = new Hashtable<String, List<Double>>();

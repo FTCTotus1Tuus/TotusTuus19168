@@ -36,7 +36,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous(name="DarienOpMode",group="NonCompete")
+// @Autonomous(name="DarienOpMode",group="NonCompete")
 
 public class DarienOpMode extends LinearOpMode{
               // ^ must be name of file
@@ -69,7 +69,7 @@ public class DarienOpMode extends LinearOpMode{
         public int robotCenterAtStart = insideTileDist/2 - robotLength/2; //Distance to the center of the first tile at start
         public double autoPower = .15;
         public double armPower = .75;
-        public int conesMax = 1;
+        public int conesMax = 2;
         public boolean interrupt = true;
     
     // INITIALIZATION OF ROBOT PARTS
@@ -107,8 +107,8 @@ public class DarienOpMode extends LinearOpMode{
         //tapeSensor = hardwareMap.get(ColorSensor.class, "tapeSensor");
         grabServo = hardwareMap.get(CRServo.class, "grabServo");
         wristServo = hardwareMap.get(CRServo.class, "wristServo");
-        grabServo.setDirection(CRServo.Direction.FORWARD);
         omniMotor0.setDirection(DcMotor.Direction.REVERSE);
+        wristServo.setDirection(CRServo.Direction.FORWARD);
         omniMotor1.setDirection(DcMotor.Direction.FORWARD);
         omniMotor2.setDirection(DcMotor.Direction.REVERSE);
         omniMotor3.setDirection(DcMotor.Direction.FORWARD);
@@ -149,26 +149,15 @@ public class DarienOpMode extends LinearOpMode{
             } 
     }
     public void moveToConeStack(){
-        // MoveY(250,autoPower);
-        // sleep(100);
-        // while(omniMotor0.isBusy()){}
-        // Rotate(270);
-        // while(omniMotor0.isBusy()){}
-        // sleep(100);
+        MoveZ(-530, armPower); //move Linear Extender up
         MoveY(-(tileDist + robotCenterAtStart),autoPower + 0.05); // robot to conestack
         wristServo.setPower(-1); // wrist towards conestack
         sleep(750);
-        wristServo.setPower(0); //turn off wrist servo
+        wristServo.setPower(-0.1); //turn off wrist servo
         waitForMotors();
-        grabServo.setPower(1); // close grabber with gusto
-        sleep(750);
-        grabServo.setPower(0); // stop closing grabber
-        MoveZ(-5400, armPower); //move Linear Extender up
-        sleep(500);
+    
         
-        MoveY((tileDist + robotCenterAtStart), autoPower); //move away from conestack
-        wristServo.setPower(1);
-        waitForMotors();
+   
     }
     public void RotateOld(int rotation, double power)
     {
@@ -181,23 +170,34 @@ public class DarienOpMode extends LinearOpMode{
     // maybe change V to Z?
     // yessir        /
     //              \/
-     public void Rotate(double heading)
+     public void Rotate(double heading, double dir)
     {   
     telemetry.addData("starting rotate function", "");
     telemetry.update();
     boolean isRotating = true;
-    if (getRawHeading() - heading > 0){
-        rotateDirection = -1;
-    }
-    else {
-        rotateDirection = 1;
-    }
+    rotateDirection = dir;
         setToRotateRunMode();
-        setRotatePower(0.35, rotateDirection);
     while (isRotating){
+    if (dir == 0){
+        if (getRawHeading() - heading > 0){
+            rotateDirection = -1;
+    }
+        else 
+        {
+           rotateDirection = 1;
+        }
+    }
+        telemetry.addData(Double.toString(getRawHeading() - heading), "");
+        telemetry.addData(Double.toString(heading), "");
+        telemetry.addData(Double.toString(getRawHeading()), "");
+        telemetry.update();    
         
         
-        if (Math.abs(0 + getRawHeading() - heading) <= 4.5) {
+        
+        if (Math.abs(getRawHeading() - heading) <= 2.25)
+            {
+            telemetry.addData(Boolean.toString(getRawHeading() > heading && dir == 1), " dir = 1");
+            telemetry.addData(Boolean.toString(getRawHeading() < heading && dir == -1), "dir = -1");
             // resetTargetRotPos();
             encoderPos0 = omniMotor0.getCurrentPosition();
             encoderPos1 = omniMotor1.getCurrentPosition();
@@ -210,12 +210,16 @@ public class DarienOpMode extends LinearOpMode{
             omniMotor3.setTargetPosition(encoderPos3);
             isRotating = false;
         telemetry.addData("finised function 1", "");
+            }
+        else if (Math.abs(getRawHeading() - heading) <= 20){
+        setRotatePower(0.18, rotateDirection);
+        telemetry.addData("Error less than 30?", "True");
         telemetry.update();    
-            
-        }
-    }
-        telemetry.addData("finised function", "");
-        telemetry.update();    
+        } else {
+        setRotatePower(0.225, rotateDirection);
+    }}
+        // telemetry.addData("finised function", "");
+        // telemetry.update();    
     }
     // maybe change V to Z?
     // yessir        /
@@ -245,7 +249,7 @@ public class DarienOpMode extends LinearOpMode{
       public void MoveX(int x, double power){
        resetEncoder();
        
-       encoderPos = (int) Math.floor((x * constant) + 0.5);
+      encoderPos = (int) Math.floor((x * constant*1.111111) + 0.5);
         
        setTargetPosX();
        
@@ -443,7 +447,7 @@ public class DarienOpMode extends LinearOpMode{
     public double getRawHeading() {
         Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         if (angles.firstAngle >= 0){
-            return angles.firstAngle;
+            return AngleUnit.normalizeDegrees(angles.firstAngle);
        
         }
         else {

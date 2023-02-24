@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Autonomous(name="Encoders", group="NonCompete")
+// @Autonomous(name="Encoders", group="NonCompete")
 //@Disabled
 public class Encoders extends LinearOpMode
 {

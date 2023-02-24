@@ -15,7 +15,7 @@ import java.util.*;
 import java.io.*;
 
 import org.firstinspires.ftc.utils.Files;
-@TeleOp(name="ControllerModeTest",group="NonCompete")
+// @TeleOp(name="ControllerModeTest",group="NonCompete")
 
 public class ControllerModeTest extends LinearOpMode{
     //Initialize Variables

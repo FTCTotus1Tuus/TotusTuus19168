@@ -20,7 +20,7 @@ import java.util.*;
 import java.io.*;
 
 import org.firstinspires.ftc.utils.Files;
-@TeleOp(name="ControllerModeGyro",group="NonCompete")
+// @TeleOp(name="ControllerModeGyro",group="NonCompete")
 
 public class ControllerModeGyro extends LinearOpMode{
     //Initialize Variables
@@ -106,7 +106,7 @@ public class ControllerModeGyro extends LinearOpMode{
             
             direction[0] = gamepad1.left_stick_x;
             direction[1] = gamepad1.left_stick_y;
-            rotation = gamepad1.right_stick_x;
+            rotation = -1 * gamepad1.right_stick_x;
             
             
         

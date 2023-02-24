@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous
+// @Autonomous
 
 public class DarienOpModeTest extends LinearOpMode{
               // ^ must be name of file
@@ -66,9 +66,9 @@ public class DarienOpModeTest extends LinearOpMode{
         public int tileDist = 600;
         public int robotLength = 420;
         public int robotCenterAtStart = tileDist/2 - robotLength/2; //Distance to the center of the first tile at start
-        public double autoPower = .4;
+        public double autoPower = .15;
         public double armPower = .45;
-        public double autoAcc =0.004;
+        public double autoAcc =0.002;
         public int conesMax = 1;
         public double accIncrement;
         public double constantPowerTime;
@@ -139,18 +139,20 @@ public class DarienOpModeTest extends LinearOpMode{
         {
             appliedPower = omniMotor0.getCurrentPosition()*acc + initialPower;
         }
-        else if (omniMotor0.getCurrentPosition() >= accIncrement && omniMotor0.getCurrentPosition() <= accIncrement + constantPowerTime/2)
+        else if (omniMotor0.getCurrentPosition() >= accIncrement && omniMotor0.getCurrentPosition() <= accIncrement + constantPowerTime)
         {
             appliedPower = targetPower;
         }
-        else if (omniMotor0.getCurrentPosition() > accIncrement + constantPowerTime/2 && omniMotor0.getCurrentPosition() < encoderPos)
+        else if (omniMotor0.getCurrentPosition() > accIncrement + constantPowerTime && omniMotor0.getCurrentPosition() < encoderPos)
         {
             appliedPower = (encoderPos-omniMotor0.getCurrentPosition())*acc;
         }
-        else 
+        
+        else
         {
             appliedPower = 0;
         }
+        
         return appliedPower;
     }
     public double varPowerRot(double heading, double acc, double targetPower)
@@ -233,17 +235,19 @@ public class DarienOpModeTest extends LinearOpMode{
     //              \/
      public void Rotate(double heading, double acc, double targetPower)
     {   
-    telemetry.addData("starting rotate function", "");
-    telemetry.update();
     boolean isRotating = true;
+    setToRotateRunMode();
+    setRotatePower(varPowerRot(heading, 0.01, 0.75), rotateDirection);
     if (getRawHeading() - heading > 0){
         rotateDirection = 1;
+    telemetry.addData("starting rotate function", "");
+    telemetry.update();
     }
     else {
         rotateDirection = -1;
+    telemetry.addData("starting rotate function", "");
+    telemetry.update();
     }
-        setToRotateRunMode();
-        setRotatePower(varPowerRot(heading, 0.01, 0.75), rotateDirection);
     while (isRotating){
         
         

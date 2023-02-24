@@ -124,7 +124,7 @@ public class ControllerMode extends LinearOpMode{
             }
             
             
-            linearExtender.setPower(-gamepad2.left_stick_y/1.2);
+            linearExtender.setPower(-gamepad2.left_stick_y/1.0); //changed to 1.2 from 1
             
             
             }
