@@ -49,6 +49,7 @@ public class DarienOpModeTest extends LinearOpMode{
     public double[] direction = {0.0,0.0};
     public int ZencoderPos =0;
     public double rotation;
+    public double[] offset = {0.0, 0.0};
     
         // ODOMETRY
             public double cos = Math.cos((Math.PI)/4);
@@ -224,7 +225,6 @@ public class DarienOpModeTest extends LinearOpMode{
     }
     public void RotateOld(int rotation, double power)
     {
-        resetEncoder();
         encoderPos = rotation;
         setTargetPosRot();
         setRunMode();
@@ -269,8 +269,6 @@ public class DarienOpModeTest extends LinearOpMode{
     //              \/
     public void MoveZ(int z, double power){
        
-       
-       
        linearExtender.setTargetPosition(z);
        linearExtender.setMode(DcMotor.RunMode.RUN_TO_POSITION);
        linearExtender.setPower(power);
@@ -279,7 +277,6 @@ public class DarienOpModeTest extends LinearOpMode{
    
    public void MoveY(int y, double power, double acceleration){
        
-       resetEncoder();
        targetPower = power;
        acc = acceleration;
        encoderPos = (int) Math.floor((y * constant+ 0.5));
@@ -293,11 +290,9 @@ public class DarienOpModeTest extends LinearOpMode{
    
    
       public void MoveX(int x, double power, double acceleration){
-       resetEncoder();
        targetPower = power;
        acc = acceleration;
        encoderPos = (int) Math.floor((x * constant) + 0.5);
-        
        setTargetPosX();
        
        setRunMode();
@@ -380,14 +375,9 @@ public class DarienOpModeTest extends LinearOpMode{
         omniMotor3.setPower(-direction*power);
         
     }
+
     
-   public void resetEncoder() 
-   {
-    omniMotor0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-   }
+
     
     public void updateMotors()
     {

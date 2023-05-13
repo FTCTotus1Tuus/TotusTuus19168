@@ -49,7 +49,9 @@ public class DarienOpMode extends LinearOpMode{
     public int encoderPos =0;
     public int ZencoderPos =0;
     public double rotation;
+    public double[] offset = {0.0, 0.0};
     
+    public double[] coords = {0.0,0.0};
         // ODOMETRY
             public double cos = Math.cos((Math.PI)/4);
             public double constMult = (48 * 2 * (Math.PI));
@@ -79,12 +81,17 @@ public class DarienOpMode extends LinearOpMode{
             public DcMotor omniMotor1; // front right
             public DcMotor omniMotor2; // back left
             public DcMotor omniMotor3; // back right
+            
+            public int rotAmounts0 = 0;
+            public int rotAmounts1 = 0;
+            public int rotAmounts2 = 0;
+            public int rotAmounts3 = 0;
     
         // ARM/CLAW MOTORS
             public DcMotor linearExtender; // claw height
             public CRServo grabServo; // claw open
             public CRServo wristServo; // claw direction
-    
+    public int rotationCount;
     
     // TAPE SENSING
             
@@ -115,85 +122,44 @@ public class DarienOpMode extends LinearOpMode{
         linearExtender.setDirection(DcMotor.Direction.REVERSE);
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu = hardwareMap.get(BNO055IMU.class, "imu"); 
         imu.initialize(parameters);
-        //servo0 = initializeServo("servo0");
-        //servo0 = hardwareMap.get(Servo.class, "wristServo");
-        //grabServo = hardwareMap.get(Servo.class, "grabServo");
-   
+
         //test/init telemetry
         print("Motors Init","");
    }    
     public void runOpMode(){
         //Necessary emptpy method for linear op mode
     }
-    public int getParkPos()
-    {
-            if (colorSensor0.red() > colorSensor0.blue() && colorSensor0.red() > (colorSensor0.green()/1.2))
-            {
-                telemetry.addData("color", "red");
-                telemetry.update();
-                return 2;
-            } 
-            else if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/1.2))
-            {
-                telemetry.addData("color", "blue");
-                telemetry.update();
-                return 3;
-            } 
-            else
-            {
-                telemetry.addData("color", "green");
-                telemetry.update();
-                return 1;
-            } 
-    }
-    public void moveToConeStack(){
-        MoveZ(-530, armPower); //move Linear Extender up
-        MoveY(-(tileDist + robotCenterAtStart),autoPower + 0.05); // robot to conestack
-        wristServo.setPower(-1); // wrist towards conestack
-        sleep(750);
-        wristServo.setPower(-0.1); //turn off wrist servo
-        waitForMotors();
-    
-        
-   
-    }
-    public void RotateOld(int rotation, double power)
-    {
-        resetEncoder();
-        encoderPos = rotation;
-        setTargetPosRot();
-        setRunMode();
-        setPower(power);
-    }
-    // maybe change V to Z?
-    // yessir        /
-    //              \/
+
+
      public void Rotate(double heading, double dir)
     {   
     telemetry.addData("starting rotate function", "");
     telemetry.update();
+    double startEncPos0 = omniMotor0.getCurrentPosition();
+    double startEncPos1 = omniMotor1.getCurrentPosition();
+    double startEncPos2 = omniMotor2.getCurrentPosition();
+    double startEncPos3 = omniMotor3.getCurrentPosition();
     boolean isRotating = true;
     rotateDirection = dir;
-        setToRotateRunMode();
+    setToRotateRunMode();
+    
     while (isRotating){
-    if (dir == 0){
-        if (getRawHeading() - heading > 0){
-            rotateDirection = -1;
-    }
-        else 
-        {
-           rotateDirection = 1;
+        if (dir == 0){
+            if (getRawHeading() - heading > 0){
+                rotateDirection = -1;
+        }
+            else 
+            {
+                rotateDirection = 1;
         }
     }
+    
         telemetry.addData(Double.toString(getRawHeading() - heading), "");
         telemetry.addData(Double.toString(heading), "");
         telemetry.addData(Double.toString(getRawHeading()), "");
         telemetry.update();    
-        
-        
-        
         if (Math.abs(getRawHeading() - heading) <= 2.25)
             {
             telemetry.addData(Boolean.toString(getRawHeading() > heading && dir == 1), " dir = 1");
@@ -203,27 +169,52 @@ public class DarienOpMode extends LinearOpMode{
             encoderPos1 = omniMotor1.getCurrentPosition();
             encoderPos2 = omniMotor2.getCurrentPosition();
             encoderPos3 = omniMotor3.getCurrentPosition();
-            setRunMode();
+            rotAmounts0 += encoderPos0 - startEncPos0;
+            rotAmounts1 += encoderPos1 - startEncPos1;
+            rotAmounts2 += encoderPos2 - startEncPos2;
+            rotAmounts3 += encoderPos3 - startEncPos3;
             omniMotor0.setTargetPosition(encoderPos0);
             omniMotor1.setTargetPosition(encoderPos1);
             omniMotor2.setTargetPosition(encoderPos2);
             omniMotor3.setTargetPosition(encoderPos3);
+            setRunMode();
             isRotating = false;
-        telemetry.addData("finised function 1", "");
+            telemetry.addData("finised function 1", "");
             }
         else if (Math.abs(getRawHeading() - heading) <= 20){
-        setRotatePower(0.18, rotateDirection);
-        telemetry.addData("Error less than 30?", "True");
-        telemetry.update();    
-        } else {
-        setRotatePower(0.225, rotateDirection);
-    }}
-        // telemetry.addData("finised function", "");
-        // telemetry.update();    
+            setRotatePower(0.18, rotateDirection);
+            telemetry.addData("Error less than 30?", "True");
+            telemetry.update();    
+        } 
+        else {
+            setRotatePower(0.225, rotateDirection);
     }
-    // maybe change V to Z?
-    // yessir        /
-    //              \/
+        
+    }}
+    
+    
+    // public void RotateEncoders(double destination, int dir, double power) {
+    //     //init code
+    //     rotateDirection = dir;
+        
+    //     // rotation code
+    //     if (dir == 0){
+    //         if (getRawHeading() - heading > 0){
+    //             rotateDirection = -1;
+    //     }
+    //         else 
+    //         {
+    //             rotateDirection = 1;
+    //     }}
+    //     double encoderPos = 10 * rotateDirection * Math.abs(getRawHeading() - destination); //encoderTicks-a bit * direction * how far to go
+    //     setTargetPosRot();
+    //     setPower(power);
+    //     while(Math.abs(getRawHeading() - destination) > 2){
+    //         print("final approach", "");
+            
+    //     }}
+    // //11.02
+    
     public void MoveZ(int z, double power){
        
        
@@ -236,7 +227,6 @@ public class DarienOpMode extends LinearOpMode{
    
    public void MoveY(int y, double power){
        
-       resetEncoder();
        encoderPos = (int) Math.floor((y * constant+ 0.5));
        setTargetPosY();
        
@@ -247,7 +237,6 @@ public class DarienOpMode extends LinearOpMode{
    
    
       public void MoveX(int x, double power){
-       resetEncoder();
        
       encoderPos = (int) Math.floor((x * constant*1.111111) + 0.5);
         
@@ -256,8 +245,6 @@ public class DarienOpMode extends LinearOpMode{
        setRunMode();
        
        setPower(power);
-       //power = 0;
-       //setPower(power);
    }
    
    
@@ -333,74 +320,31 @@ public class DarienOpMode extends LinearOpMode{
         
     }
     
-   public void resetEncoder() 
-   {
-    omniMotor0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    omniMotor3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-   }
-    
+
     public void waitForMotors()
     {
         while (omniMotor0.isBusy() && omniMotor1.isBusy() && omniMotor2.isBusy() && omniMotor3.isBusy()){}
     }
    
-   
-//   public void controllerTest()
-//   {
-//           if(gamepad1.y){
-//         this.telemetry.addData("Moving", "North...");
-//         MoveY(1 * tileDist,  0.125);
-//     };
-//     if(gamepad1.a){
-//         this.telemetry.addData("Moving", "South...");
-//         MoveY(-1 * tileDist,  0.125);
-//     }
-//     if(gamepad1.b){
-//         this.telemetry.addData("Moving", "West...");
-//         MoveX(1 * tileDist,  0.125);
-//     };
-//     if(gamepad1.x){
-//         this.telemetry.addData("Moving", "East...");
-//         MoveX(-1 * tileDist,  0.125);
-//     }
+    public double[] getCoords(){
+        
+        double[] coords = {convertEncoderPosX() + offset[0], convertEncoderPosY() + offset[1]};
+        return coords;
+    }
     
-//     if(gamepad1.dpad_down){
-//         this.telemetry.addData("Moving", "Down...");
-//         MoveZ(1 * armDist,  0.125);
-//     };
-//     if(gamepad1.dpad_up){
-//         this.telemetry.addData("Moving", "Up...");
-//         MoveZ(-1 * armDist,  0.125);
-//     }
+    public double convertEncoderPosX(){
+     return ((omniMotor0.getCurrentPosition()-rotAmounts0) 
+           -(omniMotor1.getCurrentPosition()-rotAmounts1))/2;    
+    }
+    public double convertEncoderPosY(){
+     return ((omniMotor0.getCurrentPosition()-rotAmounts0) 
+           +(omniMotor1.getCurrentPosition()-rotAmounts1))/2;    
+    }
     
-//     if(gamepad1.dpad_left){
-//         this.telemetry.addData("Moving Claw", "open");
-//         wristServo.setPosition(-10);
-//     };
-//     if(gamepad1.dpad_right){
-//         this.telemetry.addData("Moving Claw", "close");
-//         wristServo.setPosition(10);
-//     }
-//     if(gamepad1.left_bumper){
-//         this.telemetry.addData("Moving Claw", "L");
-//         grabServo.setPosition(-10);
-//     };
-//     if(gamepad1.right_bumper){
-//         this.telemetry.addData("Moving Claw", "R");
-//         grabServo.setPosition(10);
-//     }
-//   }
-    /*public boolean overTapeBlue() {
-        if (colorSensor0.blue() > colorSensor0.red() && colorSensor0.blue() > (colorSensor0.green()/1.2))
-            {
-                return true;
-            } 
-        else {
-                return false;
-        }
-    }*/
+    //y=\frac{\left(a+b\right)}{2}
+    //x=\frac{\left(a-b\right)}{2}
+    
+    
     int move_to_position;
     double y;
     

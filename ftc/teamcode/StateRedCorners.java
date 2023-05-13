@@ -44,18 +44,18 @@ public class StateRedCorners extends DarienOpMode{
         sleep(1500);
         wristServo.setPower(0.1);
         // grabServo.setPower(0.1); // stop squeezing the claw
-        parkPos = getParkPos(); //reads signal cone
+        // parkPos = getParkPos(); //reads signal cone
         waitForMotors();
         // MoveY(-2*tileDist/5 + 40 , autoPower); //backs up to center of high pole tile
         MoveY(-2*tileDist/7 + 25, autoPower*1.3); //backs up to center of mid pole tile
         waitForMotors();
-        dropRedCone();
+        // dropRedCone();
         Rotate(270, -1);
         waitForMotors();
         MoveX(tileDist+25, autoPower*1.2);
         waitForMotors();
         Rotate(270,0);
-        moveToConeStack();
+        // moveToConeStack();
         //Start loop to stack cones on high
         for (int i=0; i<conesMax; i++) {
             print("loop", "");
