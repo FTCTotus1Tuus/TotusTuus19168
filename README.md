@@ -14,6 +14,12 @@ ftc team 19168's 2023-4 season code
 [BlueCorners](ftc/teamcode/StateBlueCorners.java) and [RedCorners](ftc/teamcode/StateRedCorners.java) are the files that contains the individual commands to run the autonomous. The different files contain the different positions for the robot to start. Over the season we will freeze each auto program we use during the season using the naming convention:<br />
 Meet1Blue, Meet2Blue, Meet3Blue, RegionalsBlue, StateBlue, WorldBlue, WeWonBlue
 
+## When making improvements
+1. push changes after making sure they work on the bot <br />
+2. update issues to account for any changes made <br />
+3. update documentation to account for any changes <br />
+
+
 ### TODO
 add style guide <br />
 motor positions <br />
