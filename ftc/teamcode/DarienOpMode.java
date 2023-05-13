@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.robot.Robot;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;    
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -225,6 +225,19 @@ public class DarienOpMode extends LinearOpMode{
        
    }
    
+   public void MoveXandY(int targetX, int targetY, double power) {
+       int[] ePos0and3 = inverseEncoderPos0and3(targetX, targetY);
+       int[] ePos1and2 = inverseEncoderPos1and2(targetX, targetY);
+       
+       setTargetPosBoth(ePos0and3[0], ePos1and2[0], ePos1and2[1], ePos0and3[1]);
+       
+       setRunMode();
+       
+       setPower(power);
+   }
+   
+
+   
    public void MoveY(int y, double power){
        
        encoderPos = (int) Math.floor((y * constant+ 0.5));
@@ -247,6 +260,13 @@ public class DarienOpMode extends LinearOpMode{
        setPower(power);
    }
    
+   
+   public void setTargetPosBoth(int ePos0, int ePos1, int ePos2, int ePos3) {
+       omniMotor0.setTargetPosition(ePos0);
+       omniMotor1.setTargetPosition(ePos1);
+       omniMotor2.setTargetPosition(ePos2);
+       omniMotor3.setTargetPosition(ePos3);
+   }
    
    public void setTargetPosY()
    {
@@ -329,7 +349,7 @@ public class DarienOpMode extends LinearOpMode{
     public double[] getCoords(){
         
         double[] coords = {convertEncoderPosX() + offset[0], convertEncoderPosY() + offset[1]};
-        return coords;
+        return coords; // returns x,y pos of robot in relation to the center of the field in mm
     }
     
     public double convertEncoderPosX(){
@@ -339,6 +359,31 @@ public class DarienOpMode extends LinearOpMode{
     public double convertEncoderPosY(){
      return ((omniMotor0.getCurrentPosition()-rotAmounts0) 
            +(omniMotor1.getCurrentPosition()-rotAmounts1))/2;    
+    }
+    
+    public int[] inverseEncoderPos0and3(int targetX, int targetY) {
+        // motors 0 and 3's conversion function of coords to encoders is x+y=enocder pos, a in the notebook
+        double[] currentCoords = getCoords();
+        int distanceX = (int) Math.floor(targetX - currentCoords[0] + 0.5);
+        int distanceY = (int) Math.floor(targetY - currentCoords[1] + 0.5);
+        int coordsToEncoder = distanceX + distanceY;
+        
+        int encoderOmni0 = coordsToEncoder + rotAmounts0;
+        int encoderOmni3 = coordsToEncoder + rotAmounts3;
+        int[] ret = {encoderOmni0, encoderOmni3};
+        return ret;
+    }
+    public int[] inverseEncoderPos1and2(int targetX, int targetY) {
+        // motors 1 and 2's conversion function of coords to encoders is y-x=enocder pos, b in the notebook
+        double[] currentCoords = getCoords();
+        int distanceX = (int) Math.floor(targetX - currentCoords[0] + 0.5);
+        int distanceY = (int) Math.floor(targetY - currentCoords[1] + 0.5);
+        int coordsToEncoder = distanceY - distanceX;
+        
+        int encoderOmni1 = coordsToEncoder + rotAmounts1;
+        int encoderOmni2 = coordsToEncoder + rotAmounts2;
+        int[] ret = {encoderOmni1, encoderOmni2};
+        return ret;
     }
     
     //y=\frac{\left(a+b\right)}{2}

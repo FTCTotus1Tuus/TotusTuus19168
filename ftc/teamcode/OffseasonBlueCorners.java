@@ -37,7 +37,7 @@ public class OffseasonBlueCorners extends DarienOpMode{
         waitForStart(); // WAITS UNTIL START BUTTON IS PRESSED
 
         
-        MoveX(150, 0.1);
+        MoveXandY(tileDist, tileDist, autoPower);
         
         while (opModeIsActive()){        
     
